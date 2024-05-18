@@ -1,0 +1,12 @@
+1. Terrain and obstacles. Let's keep it simple and just treat any obstacle in the same way. They will be different only in graphics.
+2. Arrow shooters. Let's make 3 types of shooters: usual (medium range, medium armor, small reload time), long-range (long range, light armour, long reload time),  heavy crossbow shooters (long range, strong armour, medium range, very long reload time). Let's put price on each unit (100, 150 and 200 golds). The user can spent their budget on any of the shooter types. 
+3. Let's have 3 attackers types. Light infantry, armored infantry and battle axe wielders. Each level has higher attack and armour levels. The movement speed is the same. For each level it is hardcoded point, time and type of an emerging attacker.
+4. Placement Mechanics. The number of shooters is limited by the level budget. The placement can be done only before the attack begins. After that we just emulate the battle.
+5. There is some amount of gold for the user to spend on shooters (e.g.  10000 gold). It is a property of a level. 
+6. The end condition is 'All shooters or atackers dies'. There should be a timeout to win by default if no damage is done in 1 minute (an attacker stuck somewhere).
+7. Map is static. No objectives.
+8. The user clicks to place a unit selected in a separate list. The map should be scalable. Each unit should have health indicator. There should be 'Total health left' indicator. Similarly for the attackers: individual health of a unit and total health left.
+9. Difficulty will be based on the level design. There should be some simple level editor which allows to draw terrain and place enemies with spawning time.
+10. Some simple 2d view from top graphic. There should be before battle music (placement), battle music, win/loose music. Shooting arrows and hits from the attackers should be with a sound as well.
+
+Are there any more questions regarding the gameplay?
