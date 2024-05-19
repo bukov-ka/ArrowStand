@@ -1,8 +1,10 @@
-- Switches styles: ' -> " and vice versa
+- Switches styles: ' -> " and vice versa (https://github.com/bukov-ka/ArrowStand/commit/7c3841bbff3a8db2d75a63537299a2e48d4fc9de)
    Couldn't maintain strict typing
-
 
 - Sometimes rolls back the latest changes (extracting some logic into a separate class)
 
 
 - Some files become too lengthty and take too long to be re-generated each time
+It's s good thing that the whole file is regenerated. Easier to make changes.
+
+- The long context window is a bomb. 'Continue generating' and that's it
