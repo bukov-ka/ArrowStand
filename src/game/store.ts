@@ -3,12 +3,16 @@ import create from 'zustand';
 interface GameState {
   gold: number;
   shooters: { x: number; y: number; type: string }[];
+  selectedShooterType: string | null;
+  setSelectedShooterType: (type: string) => void;
   placeShooter: (x: number, y: number, type: string, cost: number) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
   gold: 10000,
   shooters: [],
+  selectedShooterType: null,
+  setSelectedShooterType: (type) => set({ selectedShooterType: type }),
   placeShooter: (x, y, type, cost) =>
     set((state) => {
       if (state.gold >= cost) {

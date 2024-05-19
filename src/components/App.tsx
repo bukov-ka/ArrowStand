@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Game from './Game';
+import { useGameStore } from '../game/store';
 
 const App = () => {
-  const [gold, setGold] = useState(10000);
+  const gold = useGameStore((state) => state.gold);
+  const setSelectedShooterType = useGameStore((state) => state.setSelectedShooterType);
+
   const shooters = [
     { type: 'Usual Shooter', cost: 100 },
     { type: 'Long-Range Shooter', cost: 150 },
@@ -17,7 +20,9 @@ const App = () => {
         <ul>
           {shooters.map((shooter) => (
             <li key={shooter.type}>
-              {shooter.type} - {shooter.cost} gold
+              <button onClick={() => setSelectedShooterType(shooter.type)}>
+                {shooter.type} - {shooter.cost} gold
+              </button>
             </li>
           ))}
         </ul>
