@@ -13,16 +13,10 @@ export class CustomScene extends Phaser.Scene {
     this.load.image('shooter', 'assets/shooter.png');
     this.load.image('longRangeShooter', 'assets/longRangeShooter.png');
     this.load.image('heavyCrossbowShooter', 'assets/heavyCrossbowShooter.png');
-    this.load.image('wall', 'assets/wall.png');
-    this.load.image('moat', 'assets/moat.png');
-    this.load.image('grass', 'assets/grass.png');
   }
 
   create() {
     this.add.image(400, 300, 'background');
-    this.add.image(200, 200, 'wall');
-    this.add.image(300, 300, 'moat');
-    this.add.image(400, 400, 'grass');
 
     this.shooters = this.add.group();
 
