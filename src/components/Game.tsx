@@ -1,4 +1,3 @@
-// src/components/Game.tsx
 import React, { useEffect } from 'react';
 import Phaser from 'phaser';
 
@@ -19,14 +18,36 @@ const Game = () => {
 
     function preload(this: Phaser.Scene) {
       // Load assets
+      this.load.image('background', 'assets/background.png');
+      this.load.image('shooter', 'assets/shooter.png');
+      this.load.image('attacker', 'assets/attacker.png');
+      this.load.audio('background-music', 'assets/background-music.mp3');
+      this.load.audio('shoot-sound', 'assets/shoot-sound.mp3');
     }
 
     function create(this: Phaser.Scene) {
-      // Set up game scene
+      // Add background
+      this.add.image(400, 300, 'background');
+
+      // Play background music
+      const music = this.sound.add('background-music');
+      music.play({ loop: true });
+
+      // Add a shooter sprite
+      const shooter = this.add.sprite(400, 500, 'shooter');
+
+      // Add a simple animation or interaction (e.g., move shooter on key press)
+      this.input.keyboard!.on('keydown-LEFT', () => {
+        shooter.x -= 10;
+      });
+
+      this.input.keyboard!.on('keydown-RIGHT', () => {
+        shooter.x += 10;
+      });
     }
 
     function update(this: Phaser.Scene) {
-      // Game logic
+      // Basic game loop logic (e.g., move attackers, check collisions)
     }
   }, []);
 
