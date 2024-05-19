@@ -1,31 +1,36 @@
-import Phaser from 'phaser';
-import { useGameStore } from './store';
+import Phaser from "phaser";
+import { useGameStore } from "./store";
 
 export class CustomScene extends Phaser.Scene {
   shooters!: Phaser.GameObjects.Group;
   attackers!: Phaser.GameObjects.Group;
-  gamePhase!: 'placement' | 'pre-battle' | 'battle';
+  gamePhase!: "placement" | "pre-battle" | "battle";
+  arrows!: Phaser.GameObjects.Group;
+  lastShotTime: Map<Phaser.GameObjects.Sprite, number>; // Track last shot time
 
   constructor() {
-    super({ key: 'CustomScene' });
+    super({ key: "CustomScene" });
+    this.lastShotTime = new Map(); // Initialize the map
   }
 
   preload() {
-    this.load.image('background', 'assets/background.png');
-    this.load.image('shooter', 'assets/shooter.png');
-    this.load.image('longRangeShooter', 'assets/longRangeShooter.png');
-    this.load.image('heavyCrossbowShooter', 'assets/heavyCrossbowShooter.png');
-    this.load.image('attacker', 'assets/attacker.png');
+    this.load.image("background", "assets/background.png");
+    this.load.image("shooter", "assets/shooter.png");
+    this.load.image("longRangeShooter", "assets/longRangeShooter.png");
+    this.load.image("heavyCrossbowShooter", "assets/heavyCrossbowShooter.png");
+    this.load.image("attacker", "assets/attacker.png");
+    this.load.image("arrow", "assets/arrow.png");
   }
 
   create() {
-    this.add.image(400, 300, 'background');
+    this.add.image(400, 300, "background");
 
     this.shooters = this.add.group();
     this.attackers = this.add.group();
+    this.arrows = this.add.group();
 
-    this.input.on('pointerdown', (pointer: { x: any; y: any; }) => {
-      if (useGameStore.getState().gamePhase === 'placement') {
+    this.input.on("pointerdown", (pointer: { x: any; y: any }) => {
+      if (useGameStore.getState().gamePhase === "placement") {
         this.handlePlacement(pointer);
       }
     });
@@ -40,9 +45,9 @@ export class CustomScene extends Phaser.Scene {
     this.gamePhase = useGameStore.getState().gamePhase;
 
     // Spawn initial attackers during the pre-battle phase
-    if (this.gamePhase === 'pre-battle') {
+    if (this.gamePhase === "pre-battle") {
       for (let i = 0; i < 5; i++) {
-        this.spawnAttacker(Phaser.Math.Between(50, 750), 0, 'Light Infantry');
+        this.spawnAttacker(Phaser.Math.Between(50, 750), 0, "Light Infantry");
       }
     }
   }
@@ -58,8 +63,13 @@ export class CustomScene extends Phaser.Scene {
 
       if (useGameStore.getState().gold >= shooterCost) {
         placeShooter(x, y, selectedShooterType, shooterCost);
-        const shooter = this.add.sprite(x, y, this.getShooterImage(selectedShooterType));
+        const shooter = this.add.sprite(
+          x,
+          y,
+          this.getShooterImage(selectedShooterType)
+        );
         this.shooters.add(shooter);
+        this.lastShotTime.set(shooter, 0); // Initialize last shot time
       }
     }
   }
@@ -71,11 +81,11 @@ export class CustomScene extends Phaser.Scene {
 
   getShooterCost(type: string): number {
     switch (type) {
-      case 'Usual Shooter':
+      case "Usual Shooter":
         return 100;
-      case 'Long-Range Shooter':
+      case "Long-Range Shooter":
         return 150;
-      case 'Heavy Crossbow Shooter':
+      case "Heavy Crossbow Shooter":
         return 200;
       default:
         return 0;
@@ -84,33 +94,33 @@ export class CustomScene extends Phaser.Scene {
 
   getShooterImage(type: string): string {
     switch (type) {
-      case 'Usual Shooter':
-        return 'shooter';
-      case 'Long-Range Shooter':
-        return 'longRangeShooter';
-      case 'Heavy Crossbow Shooter':
-        return 'heavyCrossbowShooter';
+      case "Usual Shooter":
+        return "shooter";
+      case "Long-Range Shooter":
+        return "longRangeShooter";
+      case "Heavy Crossbow Shooter":
+        return "heavyCrossbowShooter";
       default:
-        return 'shooter';
+        return "shooter";
     }
   }
 
   spawnAttackers() {
-    if (useGameStore.getState().gamePhase === 'pre-battle') {
+    if (useGameStore.getState().gamePhase === "pre-battle") {
       const x = Phaser.Math.Between(50, 750);
       const y = 0; // Spawn at the top
-      this.spawnAttacker(x, y, 'Light Infantry'); // Example type
+      this.spawnAttacker(x, y, "Light Infantry"); // Example type
     }
   }
 
   spawnAttacker(x: number, y: number, type: string) {
-    const attacker = this.add.sprite(x, y, 'attacker');
+    const attacker = this.add.sprite(x, y, "attacker");
     this.attackers.add(attacker);
     useGameStore.getState().addAttacker(x, y, type);
   }
 
   update() {
-    if (useGameStore.getState().gamePhase === 'battle') {
+    if (useGameStore.getState().gamePhase === "battle") {
       this.attackers.getChildren().forEach((attacker: any, index: number) => {
         this.moveTowardsClosestShooter(attacker);
         if (attacker.y > 600) {
@@ -134,56 +144,121 @@ export class CustomScene extends Phaser.Scene {
     const shooters = this.shooters.getChildren();
     if (shooters.length === 0) return;
 
-    let closestShooter = shooters[0] as Phaser.GameObjects.Sprite;
-    let minDistance = Phaser.Math.Distance.Between(attacker.x, attacker.y, closestShooter.x, closestShooter.y);
+    let closestShooter: Phaser.GameObjects.Sprite | null = shooters[0] as Phaser.GameObjects.Sprite;
+    let minDistance = Phaser.Math.Distance.Between(
+      attacker.x,
+      attacker.y,
+      closestShooter.x,
+      closestShooter.y
+    );
 
     shooters.forEach((shooter) => {
       const shooterSprite = shooter as Phaser.GameObjects.Sprite;
-      const distance = Phaser.Math.Distance.Between(attacker.x, attacker.y, shooterSprite.x, shooterSprite.y);
+      const distance = Phaser.Math.Distance.Between(
+        attacker.x,
+        attacker.y,
+        shooterSprite.x,
+        shooterSprite.y
+      );
       if (distance < minDistance) {
         minDistance = distance;
         closestShooter = shooterSprite;
       }
     });
 
-    const direction = new Phaser.Math.Vector2(closestShooter.x - attacker.x, closestShooter.y - attacker.y).normalize();
+    const direction = new Phaser.Math.Vector2(
+      closestShooter.x - attacker.x,
+      closestShooter.y - attacker.y
+    ).normalize();
     attacker.x += direction.x;
     attacker.y += direction.y;
+
+    // Rotate attacker to face closest shooter
+    const angle = Phaser.Math.Angle.Between(attacker.x, attacker.y, closestShooter.x, closestShooter.y);
+    attacker.setRotation(angle);
   }
 
-  updateAttackerHealthDisplay(attacker: Phaser.GameObjects.Sprite, index: number) {
+  updateAttackerHealthDisplay(
+    attacker: Phaser.GameObjects.Sprite,
+    index: number
+  ) {
     const health = useGameStore.getState().attackers[index].health;
-    const healthText = this.add.text(attacker.x, attacker.y - 20, `HP: ${health}`, { fontSize: '12px', color: '#ff0000' });
+    const healthText = this.add.text(
+      attacker.x,
+      attacker.y - 20,
+      `HP: ${health}`,
+      { fontSize: "12px", color: "#ff0000" }
+    );
     this.time.delayedCall(500, () => healthText.destroy(), [], this); // Remove health text after a short duration
   }
 
   attackNearestAttacker(shooter: Phaser.GameObjects.Sprite) {
     const attackers = this.attackers.getChildren();
-    let nearestAttacker = null;
+    let nearestAttacker: Phaser.GameObjects.Sprite | null = null;
     let minDistance = Infinity;
 
     attackers.forEach((attacker) => {
       const attackerSprite = attacker as Phaser.GameObjects.Sprite;
-      const distance = Phaser.Math.Distance.Between(shooter.x, shooter.y, attackerSprite.x, attackerSprite.y);
+      const distance = Phaser.Math.Distance.Between(
+        shooter.x,
+        shooter.y,
+        attackerSprite.x,
+        attackerSprite.y
+      );
       if (distance < minDistance) {
         minDistance = distance;
         nearestAttacker = attackerSprite;
       }
     });
 
-    if (nearestAttacker && minDistance <= this.getShooterRange(shooter.texture.key)) {
-      // Attack the nearest attacker
-      this.dealDamageToAttacker(nearestAttacker);
+    const currentTime = this.time.now;
+    const lastShot = this.lastShotTime.get(shooter) || 0;
+    if (
+      nearestAttacker &&
+      minDistance <= this.getShooterRange(shooter.texture.key) &&
+      currentTime - lastShot >= 3000 // 3 seconds reload time
+    ) {
+      // Rotate shooter to face nearest attacker
+      const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, (nearestAttacker as Phaser.GameObjects.Sprite).x, (nearestAttacker as Phaser.GameObjects.Sprite).y);
+      shooter.setRotation(angle);
+
+      // Shoot an arrow towards the nearest attacker
+      this.shootArrow(shooter, nearestAttacker);
+      this.lastShotTime.set(shooter, currentTime); // Update last shot time
     }
+  }
+
+  shootArrow(
+    shooter: Phaser.GameObjects.Sprite,
+    target: Phaser.GameObjects.Sprite
+  ) {
+    const arrow = this.add.sprite(shooter.x, shooter.y, "arrow");
+    this.arrows.add(arrow);
+
+    // Calculate angle and rotate arrow
+    const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, target.x, target.y);
+    arrow.setRotation(angle);
+
+    // Move the arrow to the target instantly
+    this.tweens.add({
+      targets: arrow,
+      x: target.x,
+      y: target.y,
+      duration: 100, // Arrow reaches the target quickly
+      onComplete: () => {
+        this.dealDamageToAttacker(target);
+        arrow.destroy();
+      },
+    });
   }
 
   getShooterRange(type: string): number {
     switch (type) {
-      case 'shooter':
+      case "shooter":
         return 200; // Example range
-      case 'longRangeShooter':
+      case "longRangeShooter":
         return 300; // Example range
-      case 'heavyCrossbowShooter':
+      case "heavyCrossbowShooter":
         return 250; // Example range
       default:
         return 200;
@@ -192,11 +267,12 @@ export class CustomScene extends Phaser.Scene {
 
   dealDamageToAttacker(attacker: Phaser.GameObjects.Sprite) {
     const attackerIndex = this.attackers.getChildren().indexOf(attacker);
-    const attackerHealth = useGameStore.getState().attackers[attackerIndex].health;
+    const attackerHealth =
+      useGameStore.getState().attackers[attackerIndex]?.health;
+    if (!attackerHealth) {
+      return;
+    }
     const newHealth = attackerHealth - 1; // Example damage
-    // Debug logs
-    console.log('attackerHealth', attackerHealth);
-    console.log('attacker', attacker);
 
     if (newHealth <= 0) {
       attacker.destroy();
@@ -213,11 +289,11 @@ export class CustomScene extends Phaser.Scene {
     if (allShootersDestroyed) {
       // Handle game loss
       this.scene.pause();
-      alert('You lose! All shooters were destroyed.');
+      alert("You lose! All shooters were destroyed.");
     } else if (allAttackersDestroyed) {
       // Handle game win
       this.scene.pause();
-      alert('You win! All attackers were destroyed.');
+      alert("You win! All attackers were destroyed.");
     }
   }
 }

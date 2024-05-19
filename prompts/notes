@@ -1,0 +1,8 @@
+- Switches styles: ' -> " and vice versa
+   Couldn't maintain strict typing
+
+
+- Sometimes rolls back the latest changes (extracting some logic into a separate class)
+
+
+- Some files become too lengthty and take too long to be re-generated each time
