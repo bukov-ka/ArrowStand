@@ -5,6 +5,8 @@ import { useGameStore } from '../game/store';
 const App = () => {
   const gold = useGameStore((state) => state.gold);
   const setSelectedShooterType = useGameStore((state) => state.setSelectedShooterType);
+  const startPreBattle = useGameStore((state) => state.startPreBattle);
+  const gamePhase = useGameStore((state) => state.gamePhase);
 
   const shooters = [
     { type: 'Usual Shooter', cost: 100 },
@@ -27,6 +29,12 @@ const App = () => {
           ))}
         </ul>
       </div>
+      {gamePhase === 'placement' && (
+        <button onClick={startPreBattle}>Start Pre-Battle</button>
+      )}
+      {gamePhase === 'pre-battle' && (
+        <button onClick={() => useGameStore.getState().startBattle()}>Start Battle</button>
+      )}
       <Game />
     </div>
   );
