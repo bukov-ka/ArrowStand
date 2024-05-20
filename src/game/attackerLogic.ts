@@ -18,6 +18,8 @@ export function spawnAttacker(this: CustomSceneType, x: number, y: number, type:
 
 export function moveTowardsClosestShooter(this: CustomSceneType, attacker: Phaser.GameObjects.Sprite) {
   const shooters = this.shooters.getChildren();
+  const attackers = this.attackers.getChildren();
+
   if (shooters.length === 0) return;
 
   let closestShooter: Phaser.GameObjects.Sprite | null = shooters[0] as Phaser.GameObjects.Sprite;
@@ -42,10 +44,40 @@ export function moveTowardsClosestShooter(this: CustomSceneType, attacker: Phase
     }
   });
 
+  let avoidVector = new Phaser.Math.Vector2(0, 0);
+
+  // Collision avoidance
+  attackers.forEach((otherAttacker) => {
+    if (otherAttacker !== attacker) {
+      const distance = Phaser.Math.Distance.Between(
+        attacker.x,
+        attacker.y,
+        (otherAttacker as Phaser.GameObjects.Sprite).x,
+        (otherAttacker as Phaser.GameObjects.Sprite).y
+      );
+      if (distance < 60) { // Adjust this value according to attacker size
+        const avoidDirection = new Phaser.Math.Vector2(
+          attacker.x - (otherAttacker as Phaser.GameObjects.Sprite).x,
+          attacker.y - (otherAttacker as Phaser.GameObjects.Sprite).y
+        ).normalize();
+        avoidVector.add(avoidDirection);
+      }
+    }
+  });
+
+  // Move towards closest shooter
   const direction = new Phaser.Math.Vector2(
     closestShooter.x - attacker.x,
     closestShooter.y - attacker.y
   ).normalize();
+
+  // Add avoidance vector to adjust direction
+  direction.add(avoidVector);
+
+  // Normalize the combined direction vector
+  direction.normalize();
+
+  // Move the attacker
   attacker.x += direction.x;
   attacker.y += direction.y;
 
@@ -53,6 +85,7 @@ export function moveTowardsClosestShooter(this: CustomSceneType, attacker: Phase
   const angle = Phaser.Math.Angle.Between(attacker.x, attacker.y, closestShooter.x, closestShooter.y);
   attacker.setRotation(angle);
 }
+
 
 export function updateAttackerHealthDisplay(this: CustomSceneType, attacker: Phaser.GameObjects.Sprite, index: number) {
   const health = useGameStore.getState().attackers[index].health;
