@@ -4,6 +4,7 @@ import { initializeScene, preloadAssets } from "./sceneSetup";
 import { handlePlacement } from "./shooterLogic";
 import { spawnAttackers, spawnAttacker, moveTowardsClosestShooter, updateAttackerHealthDisplay } from "./attackerLogic";
 import { checkGameEnd } from "./gameEndLogic";
+import { attackNearestAttacker } from "./shooterLogic";
 
 export interface CustomSceneType extends Phaser.Scene {
   shooters: Phaser.GameObjects.Group;
@@ -69,16 +70,11 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
       });
 
       this.shooters.getChildren().forEach((shooter: any) => {
-        this.attackNearestAttacker(shooter);
+        attackNearestAttacker.call(this, shooter);
       });
 
       // Check win/lose conditions
       checkGameEnd.call(this);
     }
   }
-
-  attackNearestAttacker(shooter: Phaser.GameObjects.Sprite) {
-    // Your existing attackNearestAttacker logic here
-  }
 }
-
