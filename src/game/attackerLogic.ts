@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
+import { ATTACKER_SIZE } from "./constants";
 
 export function spawnAttackers(this: CustomSceneType) {
   if (useGameStore.getState().gamePhase === "pre-battle") {
@@ -10,19 +11,28 @@ export function spawnAttackers(this: CustomSceneType) {
   }
 }
 
-export function spawnAttacker(this: CustomSceneType, x: number, y: number, type: string) {
+export function spawnAttacker(
+  this: CustomSceneType,
+  x: number,
+  y: number,
+  type: string
+) {
   const attacker = this.add.sprite(x, y, "attacker");
   this.attackers.add(attacker);
   useGameStore.getState().addAttacker(x, y, type);
 }
 
-export function moveTowardsClosestShooter(this: CustomSceneType, attacker: Phaser.GameObjects.Sprite) {
+export function moveTowardsClosestShooter(
+  this: CustomSceneType,
+  attacker: Phaser.GameObjects.Sprite
+) {
   const shooters = this.shooters.getChildren();
   const attackers = this.attackers.getChildren();
 
   if (shooters.length === 0) return;
 
-  let closestShooter: Phaser.GameObjects.Sprite | null = shooters[0] as Phaser.GameObjects.Sprite;
+  let closestShooter: Phaser.GameObjects.Sprite | null =
+    shooters[0] as Phaser.GameObjects.Sprite;
   let minDistance = Phaser.Math.Distance.Between(
     attacker.x,
     attacker.y,
@@ -55,7 +65,7 @@ export function moveTowardsClosestShooter(this: CustomSceneType, attacker: Phase
         (otherAttacker as Phaser.GameObjects.Sprite).x,
         (otherAttacker as Phaser.GameObjects.Sprite).y
       );
-      if (distance < 60) { // Adjust this value according to attacker size
+      if (distance < ATTACKER_SIZE) {
         const avoidDirection = new Phaser.Math.Vector2(
           attacker.x - (otherAttacker as Phaser.GameObjects.Sprite).x,
           attacker.y - (otherAttacker as Phaser.GameObjects.Sprite).y
@@ -82,12 +92,20 @@ export function moveTowardsClosestShooter(this: CustomSceneType, attacker: Phase
   attacker.y += direction.y;
 
   // Rotate attacker to face closest shooter
-  const angle = Phaser.Math.Angle.Between(attacker.x, attacker.y, closestShooter.x, closestShooter.y);
+  const angle = Phaser.Math.Angle.Between(
+    attacker.x,
+    attacker.y,
+    closestShooter.x,
+    closestShooter.y
+  );
   attacker.setRotation(angle);
 }
 
-
-export function updateAttackerHealthDisplay(this: CustomSceneType, attacker: Phaser.GameObjects.Sprite, index: number) {
+export function updateAttackerHealthDisplay(
+  this: CustomSceneType,
+  attacker: Phaser.GameObjects.Sprite,
+  index: number
+) {
   const health = useGameStore.getState().attackers[index].health;
   const healthText = this.add.text(
     attacker.x,
@@ -97,4 +115,3 @@ export function updateAttackerHealthDisplay(this: CustomSceneType, attacker: Pha
   );
   this.time.delayedCall(500, () => healthText.destroy(), [], this); // Remove health text after a short duration
 }
-

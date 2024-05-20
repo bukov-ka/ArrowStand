@@ -1,6 +1,10 @@
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
+import {
+  DAMAGE_AMOUNT,
+  SHOOTER_RELOAD_TIME
+} from "./constants";
 
 export function handlePlacement(
   this: CustomSceneType,
@@ -85,7 +89,7 @@ export function attackNearestAttacker(
   if (
     nearestAttacker &&
     minDistance <= getShooterRange(shooter.texture.key) &&
-    currentTime - lastShot >= 3000 // 3 seconds reload time
+    currentTime - lastShot >= SHOOTER_RELOAD_TIME
   ) {
     // Rotate shooter to face nearest attacker
     const angle = Phaser.Math.Angle.Between(
@@ -137,7 +141,7 @@ function shootArrow(
     targets: arrow,
     x: target.x,
     y: target.y,
-    duration: 100, // Arrow reaches the target quickly
+    duration: 100,
     onComplete: () => {
       dealDamageToAttacker.call(this, target);
       arrow.destroy();
@@ -155,7 +159,7 @@ function dealDamageToAttacker(
   if (!attackerHealth) {
     return;
   }
-  const newHealth = attackerHealth - 100; // Example damage
+  const newHealth = attackerHealth - DAMAGE_AMOUNT;
 
   if (newHealth <= 0) {
     attacker.destroy();
