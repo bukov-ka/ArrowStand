@@ -1,10 +1,7 @@
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
-import {
-  DAMAGE_AMOUNT,
-  SHOOTER_RELOAD_TIME
-} from "./constants";
+import { DAMAGE_AMOUNT, SHOOTER_RELOAD_TIME } from "./constants";
 
 export function handlePlacement(
   this: CustomSceneType,
@@ -156,9 +153,6 @@ function dealDamageToAttacker(
   const attackerIndex = this.attackers.getChildren().indexOf(attacker);
   const attackerHealth =
     useGameStore.getState().attackers[attackerIndex]?.health;
-  if (!attackerHealth) {
-    return;
-  }
   const newHealth = attackerHealth - DAMAGE_AMOUNT;
 
   if (newHealth <= 0) {
