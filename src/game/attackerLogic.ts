@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
-import { ATTACKER_SIZE, ATTACKER_DAMAGE, ATTACKER_RELOAD_TIME } from "./constants";
+import { ATTACKER_DAMAGE, ATTACKER_RELOAD_TIME, ATTACKER_SIZE } from "./constants";
 
 export function spawnAttackers(this: CustomSceneType) {
   if (useGameStore.getState().gamePhase === "pre-battle") {
@@ -20,6 +20,10 @@ export function spawnAttacker(
   const attacker = this.add.sprite(x, y, "attacker");
   this.attackers.add(attacker);
   useGameStore.getState().addAttacker(x, y, type);
+
+  const healthText = this.add.text(x, y - 20, `HP: 100`, { fontSize: "12px", color: "#ff0000" });
+  this.healthTexts.set(attacker, healthText); // Store the health text in the map
+
   return attacker;
 }
 
@@ -110,9 +114,26 @@ export function moveTowardsClosestShooter(
       this.lastAttackTime.set(attacker, currentTime);
     }
   }
+
+  // Update the health display for the attacker
+  updateAttackerHealthDisplay.call(this, attacker);
 }
 
-function dealDamageToShooter(
+export function updateAttackerHealthDisplay(
+  this: CustomSceneType,
+  attacker: Phaser.GameObjects.Sprite
+) {
+  const attackerIndex = this.attackers.getChildren().indexOf(attacker);
+  const health = useGameStore.getState().attackers[attackerIndex]?.health;
+  const healthText = this.healthTexts.get(attacker);
+
+  if (healthText) {
+    healthText.setText(`HP: ${health}`);
+    healthText.setPosition(attacker.x, attacker.y - 20);
+  }
+}
+
+export function dealDamageToShooter(
   this: CustomSceneType,
   shooter: Phaser.GameObjects.Sprite
 ) {
@@ -126,19 +147,4 @@ function dealDamageToShooter(
   } else {
     useGameStore.getState().updateShooterHealth(shooterIndex, newHealth);
   }
-}
-
-export function updateAttackerHealthDisplay(
-  this: CustomSceneType,
-  attacker: Phaser.GameObjects.Sprite,
-  index: number
-) {
-  const health = useGameStore.getState().attackers[index].health;
-  const healthText = this.add.text(
-    attacker.x,
-    attacker.y - 20,
-    `HP: ${health}`,
-    { fontSize: "12px", color: "#ff0000" }
-  );
-  this.time.delayedCall(500, () => healthText.destroy(), [], this); // Remove health text after a short duration
 }

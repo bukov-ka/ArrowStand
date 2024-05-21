@@ -16,7 +16,8 @@ export interface CustomSceneType extends Phaser.Scene {
   attackers: Phaser.GameObjects.Group;
   arrows: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
-  lastAttackTime: Map<Phaser.GameObjects.Sprite, number>; // Add this line
+  lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
+  healthTexts: Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Text>; // Add this line
   gamePhase: "placement" | "pre-battle" | "battle";
 }
 
@@ -25,13 +26,15 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
   attackers!: Phaser.GameObjects.Group;
   arrows!: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
-  lastAttackTime: Map<Phaser.GameObjects.Sprite, number>; // Add this line
+  lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
+  healthTexts: Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Text>; // Add this line
   gamePhase: "placement" | "pre-battle" | "battle";
 
   constructor() {
     super({ key: "CustomScene" });
     this.lastShotTime = new Map();
-    this.lastAttackTime = new Map(); // Add this line
+    this.lastAttackTime = new Map();
+    this.healthTexts = new Map(); // Add this line
     this.gamePhase = "placement"; // Default initial value
   }
 
@@ -75,7 +78,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     if (useGameStore.getState().gamePhase === "battle") {
       this.attackers.getChildren().forEach((attacker: any, index: number) => {
         moveTowardsClosestShooter.call(this, attacker);
-        updateAttackerHealthDisplay.call(this, attacker, index);
+        updateAttackerHealthDisplay.call(this, attacker);
       });
 
       this.shooters.getChildren().forEach((shooter: any) => {

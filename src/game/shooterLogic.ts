@@ -151,14 +151,20 @@ function dealDamageToAttacker(
   attacker: Phaser.GameObjects.Sprite
 ) {
   const attackerIndex = this.attackers.getChildren().indexOf(attacker);
-  const attackerHealth =
-    useGameStore.getState().attackers[attackerIndex]?.health;
+  const attackerHealth = useGameStore.getState().attackers[attackerIndex]?.health;
   const newHealth = attackerHealth - DAMAGE_AMOUNT;
 
   if (newHealth <= 0) {
+    // Destroy the attacker and its health text
+    const healthText = this.healthTexts.get(attacker);
+    if (healthText) {
+      healthText.destroy();
+      this.healthTexts.delete(attacker);
+    }
     attacker.destroy();
     useGameStore.getState().updateAttackerHealth(attackerIndex, 0);
   } else {
     useGameStore.getState().updateAttackerHealth(attackerIndex, newHealth);
   }
 }
+
