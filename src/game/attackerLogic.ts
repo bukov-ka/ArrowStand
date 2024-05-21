@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
-import { ATTACKER_SIZE } from "./constants";
+import { ATTACKER_SIZE, ATTACKER_DAMAGE, ATTACKER_RELOAD_TIME } from "./constants";
 
 export function spawnAttackers(this: CustomSceneType) {
   if (useGameStore.getState().gamePhase === "pre-battle") {
@@ -16,10 +16,11 @@ export function spawnAttacker(
   x: number,
   y: number,
   type: string
-) {
+): Phaser.GameObjects.Sprite {
   const attacker = this.add.sprite(x, y, "attacker");
   this.attackers.add(attacker);
   useGameStore.getState().addAttacker(x, y, type);
+  return attacker;
 }
 
 export function moveTowardsClosestShooter(
@@ -99,6 +100,32 @@ export function moveTowardsClosestShooter(
     closestShooter.y
   );
   attacker.setRotation(angle);
+
+  // Check if the attacker is close enough to deal damage
+  if (minDistance < ATTACKER_SIZE) {
+    const currentTime = this.time.now;
+    const lastAttack = this.lastAttackTime.get(attacker) || 0;
+    if (currentTime - lastAttack >= ATTACKER_RELOAD_TIME) {
+      dealDamageToShooter.call(this, closestShooter);
+      this.lastAttackTime.set(attacker, currentTime);
+    }
+  }
+}
+
+function dealDamageToShooter(
+  this: CustomSceneType,
+  shooter: Phaser.GameObjects.Sprite
+) {
+  const shooterIndex = this.shooters.getChildren().indexOf(shooter);
+  const shooterHealth = useGameStore.getState().shooters[shooterIndex]?.health;
+  const newHealth = shooterHealth - ATTACKER_DAMAGE;
+
+  if (newHealth <= 0) {
+    shooter.destroy();
+    useGameStore.getState().updateShooterHealth(shooterIndex, 0);
+  } else {
+    useGameStore.getState().updateShooterHealth(shooterIndex, newHealth);
+  }
 }
 
 export function updateAttackerHealthDisplay(

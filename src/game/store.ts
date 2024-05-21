@@ -7,9 +7,16 @@ interface Attacker {
   health: number;
 }
 
+interface Shooter {
+  x: number;
+  y: number;
+  type: string;
+  health: number;
+}
+
 interface GameState {
   gold: number;
-  shooters: { x: number; y: number; type: string }[];
+  shooters: Shooter[];
   attackers: Attacker[];
   selectedShooterType: string | null;
   gamePhase: "placement" | "pre-battle" | "battle";
@@ -19,6 +26,7 @@ interface GameState {
   startBattle: () => void;
   addAttacker: (x: number, y: number, type: string) => void;
   updateAttackerHealth: (index: number, health: number) => void;
+  updateShooterHealth: (index: number, health: number) => void; // Add this line
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -33,7 +41,7 @@ export const useGameStore = create<GameState>((set) => ({
       if (state.gold >= cost) {
         return {
           gold: state.gold - cost,
-          shooters: [...state.shooters, { x, y, type }],
+          shooters: [...state.shooters, { x, y, type, health: 100 }], // Default health for simplicity
         };
       }
       return state;
@@ -51,5 +59,13 @@ export const useGameStore = create<GameState>((set) => ({
         attackers[index].health = health;
       }
       return { attackers };
+    }),
+  updateShooterHealth: (index, health) =>
+    set((state) => {
+      const shooters = [...state.shooters];
+      if (shooters[index]) {
+        shooters[index].health = health;
+      }
+      return { shooters };
     }),
 }));
