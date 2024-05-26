@@ -1,4 +1,5 @@
 import create from "zustand";
+import { ShooterConfig, ShooterType } from "./shooterConfig";
 
 interface Attacker {
   x: number;
@@ -10,7 +11,7 @@ interface Attacker {
 interface Shooter {
   x: number;
   y: number;
-  type: string;
+  type: ShooterType;
   health: number;
 }
 
@@ -18,15 +19,15 @@ interface GameState {
   gold: number;
   shooters: Shooter[];
   attackers: Attacker[];
-  selectedShooterType: string | null;
+  selectedShooterType: ShooterType | null;
   gamePhase: "placement" | "pre-battle" | "battle";
-  setSelectedShooterType: (type: string) => void;
-  placeShooter: (x: number, y: number, type: string, cost: number) => void;
+  setSelectedShooterType: (type: ShooterType) => void;
+  placeShooter: (x: number, y: number, type: ShooterType, cost: number) => void;
   startPreBattle: () => void;
   startBattle: () => void;
   addAttacker: (x: number, y: number, type: string) => void;
   updateAttackerHealth: (index: number, health: number) => void;
-  updateShooterHealth: (index: number, health: number) => void; // Add this line
+  updateShooterHealth: (index: number, health: number) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -39,9 +40,10 @@ export const useGameStore = create<GameState>((set) => ({
   placeShooter: (x, y, type, cost) =>
     set((state) => {
       if (state.gold >= cost) {
+        const { health } = ShooterConfig[type];
         return {
           gold: state.gold - cost,
-          shooters: [...state.shooters, { x, y, type, health: 100 }], // Default health for simplicity
+          shooters: [...state.shooters, { x, y, type, health }],
         };
       }
       return state;
@@ -50,7 +52,7 @@ export const useGameStore = create<GameState>((set) => ({
   startBattle: () => set({ gamePhase: "battle" }),
   addAttacker: (x, y, type) =>
     set((state) => ({
-      attackers: [...state.attackers, { x, y, type, health: 100 }], // Default health for simplicity
+      attackers: [...state.attackers, { x, y, type, health: 100 }],
     })),
   updateAttackerHealth: (index, health) =>
     set((state) => {

@@ -1,7 +1,8 @@
+// src/game/shooterLogic.ts
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
-import { DAMAGE_AMOUNT, SHOOTER_RELOAD_TIME } from "./constants";
+import { ShooterConfig, ShooterType } from "./shooterConfig";
 
 export function handlePlacement(
   this: CustomSceneType,
@@ -13,46 +14,33 @@ export function handlePlacement(
   const placeShooter = useGameStore.getState().placeShooter;
 
   if (selectedShooterType && canPlaceShooter(x, y)) {
-    const shooterCost = getShooterCost(selectedShooterType);
+    const { cost } = ShooterConfig[selectedShooterType];
 
-    if (useGameStore.getState().gold >= shooterCost) {
-      placeShooter(x, y, selectedShooterType, shooterCost);
+    if (useGameStore.getState().gold >= cost) {
+      placeShooter(x, y, selectedShooterType, cost);
       const shooter = this.add.sprite(
         x,
         y,
         getShooterImage(selectedShooterType)
       );
       this.shooters.add(shooter);
-      this.lastShotTime.set(shooter, 0); // Initialize last shot time
+      this.lastShotTime.set(shooter, 0);
     }
   }
 }
 
-export function canPlaceShooter(x: number, y: number): boolean {
+function canPlaceShooter(x: number, y: number): boolean {
   // Add validation logic here (e.g., not on obstacles, within budget)
   return true;
 }
 
-export function getShooterCost(type: string): number {
+export function getShooterImage(type: ShooterType): string {
   switch (type) {
-    case "Usual Shooter":
-      return 100;
-    case "Long-Range Shooter":
-      return 150;
-    case "Heavy Crossbow Shooter":
-      return 200;
-    default:
-      return 0;
-  }
-}
-
-export function getShooterImage(type: string): string {
-  switch (type) {
-    case "Usual Shooter":
+    case "UsualShooter":
       return "shooter";
-    case "Long-Range Shooter":
+    case "LongRangeShooter":
       return "longRangeShooter";
-    case "Heavy Crossbow Shooter":
+    case "HeavyCrossbowShooter":
       return "heavyCrossbowShooter";
     default:
       return "shooter";
@@ -83,12 +71,12 @@ export function attackNearestAttacker(
 
   const currentTime = this.time.now;
   const lastShot = this.lastShotTime.get(shooter) || 0;
+  const shooterType = getShooterTypeBySprite(shooter);
   if (
     nearestAttacker &&
-    minDistance <= getShooterRange(shooter.texture.key) &&
-    currentTime - lastShot >= SHOOTER_RELOAD_TIME
+    minDistance <= ShooterConfig[shooterType].range &&
+    currentTime - lastShot >= ShooterConfig[shooterType].reloadTime
   ) {
-    // Rotate shooter to face nearest attacker
     const angle = Phaser.Math.Angle.Between(
       shooter.x,
       shooter.y,
@@ -96,23 +84,23 @@ export function attackNearestAttacker(
       (nearestAttacker as Phaser.GameObjects.Sprite).y
     );
     shooter.setRotation(angle);
-
-    // Shoot an arrow towards the nearest attacker
     shootArrow.call(this, shooter, nearestAttacker);
-    this.lastShotTime.set(shooter, currentTime); // Update last shot time
+    this.lastShotTime.set(shooter, currentTime);
   }
 }
 
-function getShooterRange(type: string): number {
-  switch (type) {
+function getShooterTypeBySprite(
+  shooter: Phaser.GameObjects.Sprite
+): ShooterType {
+  switch (shooter.texture.key) {
     case "shooter":
-      return 200; // Example range
+      return "UsualShooter";
     case "longRangeShooter":
-      return 300; // Example range
+      return "LongRangeShooter";
     case "heavyCrossbowShooter":
-      return 250; // Example range
+      return "HeavyCrossbowShooter";
     default:
-      return 200;
+      return "UsualShooter";
   }
 }
 
@@ -123,8 +111,6 @@ function shootArrow(
 ) {
   const arrow = this.add.sprite(shooter.x, shooter.y, "arrow");
   this.arrows.add(arrow);
-
-  // Calculate angle and rotate arrow
   const angle = Phaser.Math.Angle.Between(
     shooter.x,
     shooter.y,
@@ -132,15 +118,18 @@ function shootArrow(
     target.y
   );
   arrow.setRotation(angle);
-
-  // Move the arrow to the target instantly
   this.tweens.add({
     targets: arrow,
     x: target.x,
     y: target.y,
     duration: 100,
     onComplete: () => {
-      dealDamageToAttacker.call(this, target);
+      const shooterType = getShooterTypeBySprite(shooter);
+      dealDamageToAttacker.call(
+        this,
+        target,
+        ShooterConfig[shooterType].damage
+      );
       arrow.destroy();
     },
   });
@@ -148,14 +137,15 @@ function shootArrow(
 
 function dealDamageToAttacker(
   this: CustomSceneType,
-  attacker: Phaser.GameObjects.Sprite
+  attacker: Phaser.GameObjects.Sprite,
+  damage: number
 ) {
   const attackerIndex = this.attackers.getChildren().indexOf(attacker);
-  const attackerHealth = useGameStore.getState().attackers[attackerIndex]?.health;
-  const newHealth = attackerHealth - DAMAGE_AMOUNT;
+  const attackerHealth =
+    useGameStore.getState().attackers[attackerIndex]?.health;
+  const newHealth = attackerHealth - damage;
 
   if (newHealth <= 0) {
-    // Destroy the attacker and its health text
     const healthText = this.healthTexts.get(attacker);
     if (healthText) {
       healthText.destroy();
@@ -167,4 +157,3 @@ function dealDamageToAttacker(
     useGameStore.getState().updateAttackerHealth(attackerIndex, newHealth);
   }
 }
-
