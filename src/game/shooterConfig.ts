@@ -12,7 +12,8 @@ export const ShooterConfig = {
       health: 50,
       damage: 75,
       range: 500,
-      reloadTime: 5000,
+      reloadTime: 3000,
+      aoeRadius: 100, // AOE radius for Long-Range Shooter
       cost: 150,
     },
     HeavyCrossbowShooter: {

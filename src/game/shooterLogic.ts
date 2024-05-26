@@ -18,11 +18,7 @@ export function handlePlacement(
 
     if (useGameStore.getState().gold >= cost) {
       placeShooter(x, y, selectedShooterType, cost);
-      const shooter = this.add.sprite(
-        x,
-        y,
-        getShooterImage(selectedShooterType)
-      );
+      const shooter = this.add.sprite(x, y, getShooterImage(selectedShooterType));
       this.shooters.add(shooter);
       this.lastShotTime.set(shooter, 0);
     }
@@ -30,7 +26,6 @@ export function handlePlacement(
 }
 
 function canPlaceShooter(x: number, y: number): boolean {
-  // Add validation logic here (e.g., not on obstacles, within budget)
   return true;
 }
 
@@ -89,9 +84,7 @@ export function attackNearestAttacker(
   }
 }
 
-function getShooterTypeBySprite(
-  shooter: Phaser.GameObjects.Sprite
-): ShooterType {
+function getShooterTypeBySprite(shooter: Phaser.GameObjects.Sprite): ShooterType {
   switch (shooter.texture.key) {
     case "shooter":
       return "UsualShooter";
@@ -111,12 +104,7 @@ function shootArrow(
 ) {
   const arrow = this.add.sprite(shooter.x, shooter.y, "arrow");
   this.arrows.add(arrow);
-  const angle = Phaser.Math.Angle.Between(
-    shooter.x,
-    shooter.y,
-    target.x,
-    target.y
-  );
+  const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, target.x, target.y);
   arrow.setRotation(angle);
   this.tweens.add({
     targets: arrow,
@@ -125,11 +113,12 @@ function shootArrow(
     duration: 100,
     onComplete: () => {
       const shooterType = getShooterTypeBySprite(shooter);
-      dealDamageToAttacker.call(
-        this,
-        target,
-        ShooterConfig[shooterType].damage
-      );
+      if (shooterType === "LongRangeShooter") {
+        drawDamageRadius.call(this, target.x, target.y, ShooterConfig[shooterType].aoeRadius);
+        dealAOEDamage.call(this, target, ShooterConfig[shooterType].damage, ShooterConfig[shooterType].aoeRadius);
+      } else {
+        dealDamageToAttacker.call(this, target, ShooterConfig[shooterType].damage);
+      }
       arrow.destroy();
     },
   });
@@ -141,8 +130,7 @@ function dealDamageToAttacker(
   damage: number
 ) {
   const attackerIndex = this.attackers.getChildren().indexOf(attacker);
-  const attackerHealth =
-    useGameStore.getState().attackers[attackerIndex]?.health;
+  const attackerHealth = useGameStore.getState().attackers[attackerIndex]?.health;
   const newHealth = attackerHealth - damage;
 
   if (newHealth <= 0) {
@@ -156,4 +144,30 @@ function dealDamageToAttacker(
   } else {
     useGameStore.getState().updateAttackerHealth(attackerIndex, newHealth);
   }
+}
+
+function dealAOEDamage(
+  this: CustomSceneType,
+  center: Phaser.GameObjects.Sprite,
+  damage: number,
+  radius: number
+) {
+  const attackers = this.attackers.getChildren();
+  attackers.forEach((attacker) => {
+    const attackerSprite = attacker as Phaser.GameObjects.Sprite;
+    const distance = Phaser.Math.Distance.Between(center.x, center.y, attackerSprite.x, attackerSprite.y);
+    if (distance <= radius) {
+      dealDamageToAttacker.call(this, attackerSprite, damage);
+    }
+  });
+}
+
+function drawDamageRadius(this: CustomSceneType, x: number, y: number, radius: number) {
+  const circle = this.add.circle(x, y, radius, 0xff0000, 0.3);
+  this.time.addEvent({
+    delay: 500, // Adjust the duration the circle is visible as needed
+    callback: () => {
+      circle.destroy();
+    },
+  });
 }
