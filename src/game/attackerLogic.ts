@@ -3,11 +3,18 @@ import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
 import { ATTACKER_DAMAGE, ATTACKER_RELOAD_TIME, ATTACKER_SIZE } from "./constants";
 
+let spawnCounter = 0; // Keep track of the spawn count
+
 export function spawnAttackers(this: CustomSceneType) {
-  if (useGameStore.getState().gamePhase === "pre-battle") {
-    const x = Phaser.Math.Between(50, 750);
-    const y = 0; // Spawn at the top
-    spawnAttacker.call(this, x, y, "Light Infantry"); // Example type
+  if (useGameStore.getState().gamePhase === "battle") {
+    spawnCounter++;
+    const numberOfAttackersToSpawn = Math.floor(spawnCounter / 5) + 1; // Increase the number of attackers over time
+
+    for (let i = 0; i < numberOfAttackersToSpawn; i++) {
+      const x = Phaser.Math.Between(50, 750);
+      const y = 0; // Spawn at the top
+      spawnAttacker.call(this, x, y, "Light Infantry");
+    }
   }
 }
 

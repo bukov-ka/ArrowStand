@@ -11,8 +11,8 @@ export function checkGameEnd(this: CustomSceneType) {
     alert("You lose! All shooters were destroyed.");
   } else if (allAttackersDestroyed) {
     // Handle game win
-    this.scene.pause();
-    alert("You win! All attackers were destroyed.");
+    // this.scene.pause();
+    // alert("You win! All attackers were destroyed.");
   }
 }
 

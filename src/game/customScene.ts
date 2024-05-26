@@ -59,19 +59,6 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     });
 
     this.gamePhase = useGameStore.getState().gamePhase;
-
-    // Spawn initial attackers during the pre-battle phase
-    if (this.gamePhase === "pre-battle") {
-      for (let i = 0; i < 5; i++) {
-        const attacker = spawnAttacker.call(
-          this,
-          Phaser.Math.Between(50, 750),
-          0,
-          "Light Infantry"
-        );
-        this.lastAttackTime.set(attacker, 0); // Initialize last attack time
-      }
-    }
   }
 
   update() {
