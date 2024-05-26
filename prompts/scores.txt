@@ -1,0 +1,2 @@
+heavy+wizards: 1792
+wizards: 2165

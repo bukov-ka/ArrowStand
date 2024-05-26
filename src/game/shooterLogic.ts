@@ -31,14 +31,14 @@ function canPlaceShooter(x: number, y: number): boolean {
 
 export function getShooterImage(type: ShooterType): string {
   switch (type) {
-    case "UsualShooter":
-      return "shooter";
-    case "LongRangeShooter":
-      return "longRangeShooter";
-    case "HeavyCrossbowShooter":
-      return "heavyCrossbowShooter";
+    case "Archer":
+      return "archer";
+    case "Wizard":
+      return "wizard";
+    case "ShieldWielder":
+      return "shieldWielder";
     default:
-      return "shooter";
+      return "archer";
   }
 }
 
@@ -86,14 +86,14 @@ export function attackNearestAttacker(
 
 function getShooterTypeBySprite(shooter: Phaser.GameObjects.Sprite): ShooterType {
   switch (shooter.texture.key) {
-    case "shooter":
-      return "UsualShooter";
-    case "longRangeShooter":
-      return "LongRangeShooter";
-    case "heavyCrossbowShooter":
-      return "HeavyCrossbowShooter";
+    case "archer":
+      return "Archer";
+    case "wizard":
+      return "Wizard";
+    case "shieldWielder":
+      return "ShieldWielder";
     default:
-      return "UsualShooter";
+      return "Archer";
   }
 }
 
@@ -113,7 +113,7 @@ function shootArrow(
     duration: 100,
     onComplete: () => {
       const shooterType = getShooterTypeBySprite(shooter);
-      if (shooterType === "LongRangeShooter") {
+      if (shooterType === "Wizard") {
         drawDamageRadius.call(this, target.x, target.y, ShooterConfig[shooterType].aoeRadius);
         dealAOEDamage.call(this, target, ShooterConfig[shooterType].damage, ShooterConfig[shooterType].aoeRadius);
       } else {
@@ -141,6 +141,7 @@ function dealDamageToAttacker(
     }
     attacker.destroy();
     useGameStore.getState().updateAttackerHealth(attackerIndex, 0);
+    useGameStore.getState().increaseScore(); // Increase score when attacker is destroyed
   } else {
     useGameStore.getState().updateAttackerHealth(attackerIndex, newHealth);
   }

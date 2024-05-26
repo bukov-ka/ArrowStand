@@ -21,6 +21,7 @@ interface GameState {
   attackers: Attacker[];
   selectedShooterType: ShooterType | null;
   gamePhase: "placement" | "pre-battle" | "battle";
+  score: number;
   setSelectedShooterType: (type: ShooterType) => void;
   placeShooter: (x: number, y: number, type: ShooterType, cost: number) => void;
   startPreBattle: () => void;
@@ -28,6 +29,7 @@ interface GameState {
   addAttacker: (x: number, y: number, type: string) => void;
   updateAttackerHealth: (index: number, health: number) => void;
   updateShooterHealth: (index: number, health: number) => void;
+  increaseScore: () => void; // Add increaseScore method
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -36,6 +38,7 @@ export const useGameStore = create<GameState>((set) => ({
   attackers: [],
   selectedShooterType: null,
   gamePhase: "placement",
+  score: 0, // Initialize score
   setSelectedShooterType: (type) => set({ selectedShooterType: type }),
   placeShooter: (x, y, type, cost) =>
     set((state) => {
@@ -70,4 +73,8 @@ export const useGameStore = create<GameState>((set) => ({
       }
       return { shooters };
     }),
+  increaseScore: () =>
+    set((state) => ({
+      score: state.score + 1,
+    })),
 }));

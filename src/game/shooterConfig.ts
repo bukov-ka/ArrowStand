@@ -1,27 +1,25 @@
-// src/game/shooterConfig.ts
-
 export const ShooterConfig = {
-    UsualShooter: {
+    Archer: {
       health: 100,
       damage: 100,
-      range: 200,
+      range: 500,
       reloadTime: 3000,
       cost: 100,
     },
-    LongRangeShooter: {
+    Wizard: {
       health: 50,
-      damage: 75,
+      damage: 25,
       range: 500,
       reloadTime: 3000,
-      aoeRadius: 100, // AOE radius for Long-Range Shooter
-      cost: 150,
+      aoeRadius: 100,
+      cost: 200,
     },
-    HeavyCrossbowShooter: {
+    ShieldWielder: {
       health: 300,
-      damage: 10,
+      damage: 50,
       range: 100,
       reloadTime: 7000,
-      cost: 200,
+      cost: 100,
     },
   };
   
