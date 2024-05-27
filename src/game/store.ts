@@ -22,6 +22,10 @@ interface GameState {
   selectedShooterType: ShooterType | null;
   gamePhase: "placement" | "pre-battle" | "battle";
   score: number;
+  totalTimeSurvived: number;
+  attackersDestroyedByArcher: number;
+  attackersDestroyedByWizard: number;
+  attackersDestroyedByShieldWielder: number;
   setSelectedShooterType: (type: ShooterType) => void;
   placeShooter: (x: number, y: number, type: ShooterType, cost: number) => void;
   startPreBattle: () => void;
@@ -29,7 +33,8 @@ interface GameState {
   addAttacker: (x: number, y: number, type: string) => void;
   updateAttackerHealth: (index: number, health: number) => void;
   updateShooterHealth: (index: number, health: number) => void;
-  increaseScore: () => void; // Add increaseScore method
+  increaseScore: (shooterType: ShooterType) => void;
+  updateTimeSurvived: (time: number) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -38,7 +43,11 @@ export const useGameStore = create<GameState>((set) => ({
   attackers: [],
   selectedShooterType: null,
   gamePhase: "placement",
-  score: 0, // Initialize score
+  score: 0,
+  totalTimeSurvived: 0,
+  attackersDestroyedByArcher: 0,
+  attackersDestroyedByWizard: 0,
+  attackersDestroyedByShieldWielder: 0,
   setSelectedShooterType: (type) => set({ selectedShooterType: type }),
   placeShooter: (x, y, type, cost) =>
     set((state) => {
@@ -73,8 +82,17 @@ export const useGameStore = create<GameState>((set) => ({
       }
       return { shooters };
     }),
-  increaseScore: () =>
-    set((state) => ({
-      score: state.score + 1,
-    })),
+  increaseScore: (shooterType) =>
+    set((state) => {
+      const newState: Partial<GameState> = { score: state.score + 1 };
+      if (shooterType === "Archer") {
+        newState.attackersDestroyedByArcher = state.attackersDestroyedByArcher + 1;
+      } else if (shooterType === "Wizard") {
+        newState.attackersDestroyedByWizard = state.attackersDestroyedByWizard + 1;
+      } else if (shooterType === "ShieldWielder") {
+        newState.attackersDestroyedByShieldWielder = state.attackersDestroyedByShieldWielder + 1;
+      }
+      return newState;
+    }),
+  updateTimeSurvived: (time) => set({ totalTimeSurvived: time }), // Add this
 }));

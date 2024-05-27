@@ -1,5 +1,5 @@
-import Phaser from "phaser";
 import { CustomSceneType } from "./customScene";
+import { useGameStore } from "./store";
 
 export function checkGameEnd(this: CustomSceneType) {
   const allShootersDestroyed = this.shooters.getChildren().length === 0;
@@ -8,11 +8,27 @@ export function checkGameEnd(this: CustomSceneType) {
   if (allShootersDestroyed) {
     // Handle game loss
     this.scene.pause();
-    alert("You lose! All shooters were destroyed.");
-  } else if (allAttackersDestroyed) {
-    // Handle game win
-    // this.scene.pause();
-    // alert("You win! All attackers were destroyed.");
-  }
+    const {
+      totalTimeSurvived,
+      attackersDestroyedByArcher,
+      attackersDestroyedByWizard,
+      attackersDestroyedByShieldWielder,
+    } = useGameStore.getState();
+    alert(
+      `You lose! All shooters were destroyed.\nTotal Survival Time: ${totalTimeSurvived}s\nAttackers Destroyed by Archers: ${attackersDestroyedByArcher}\nAttackers Destroyed by Wizards: ${attackersDestroyedByWizard}\nAttackers Destroyed by Shield Wielders: ${attackersDestroyedByShieldWielder}`
+    );
+  } 
+  // else if (allAttackersDestroyed) {
+  //   // Handle game win
+  //   this.scene.pause();
+  //   const {
+  //     totalTimeSurvived,
+  //     attackersDestroyedByArcher,
+  //     attackersDestroyedByWizard,
+  //     attackersDestroyedByShieldWielder,
+  //   } = useGameStore.getState();
+  //   alert(
+  //     `You win! All attackers were destroyed.\nTotal Survival Time: ${totalTimeSurvived}s\nAttackers Destroyed by Archers: ${attackersDestroyedByArcher}\nAttackers Destroyed by Wizards: ${attackersDestroyedByWizard}\nAttackers Destroyed by Shield Wielders: ${attackersDestroyedByShieldWielder}`
+  //   );
+  // }
 }
-

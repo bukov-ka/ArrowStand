@@ -27,15 +27,17 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
   arrows!: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
-  healthTexts: Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Text>; // Add this line
+  healthTexts: Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Text>;
   gamePhase: "placement" | "pre-battle" | "battle";
+  startTime: number;
 
   constructor() {
     super({ key: "CustomScene" });
     this.lastShotTime = new Map();
     this.lastAttackTime = new Map();
-    this.healthTexts = new Map(); // Add this line
-    this.gamePhase = "placement"; // Default initial value
+    this.healthTexts = new Map();
+    this.gamePhase = "placement";
+    this.startTime = 0;
   }
 
   preload() {
@@ -59,6 +61,8 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     });
 
     this.gamePhase = useGameStore.getState().gamePhase;
+
+    this.startTime = this.time.now; // Record start time
   }
 
   update() {
@@ -75,5 +79,9 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
       // Check win/lose conditions
       checkGameEnd.call(this);
     }
+
+    const currentTime = this.time.now;
+    const survivedTime = Math.floor((currentTime - this.startTime) / 1000); // Calculate total time survived
+    useGameStore.getState().updateTimeSurvived(survivedTime); // Update the state
   }
 }

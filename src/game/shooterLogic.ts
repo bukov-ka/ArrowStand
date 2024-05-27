@@ -117,7 +117,7 @@ function shootArrow(
         drawDamageRadius.call(this, target.x, target.y, ShooterConfig[shooterType].aoeRadius);
         dealAOEDamage.call(this, target, ShooterConfig[shooterType].damage, ShooterConfig[shooterType].aoeRadius);
       } else {
-        dealDamageToAttacker.call(this, target, ShooterConfig[shooterType].damage);
+        dealDamageToAttacker.call(this, target, ShooterConfig[shooterType].damage, shooterType); // Pass shooterType
       }
       arrow.destroy();
     },
@@ -127,7 +127,8 @@ function shootArrow(
 function dealDamageToAttacker(
   this: CustomSceneType,
   attacker: Phaser.GameObjects.Sprite,
-  damage: number
+  damage: number,
+  shooterType: ShooterType
 ) {
   const attackerIndex = this.attackers.getChildren().indexOf(attacker);
   const attackerHealth = useGameStore.getState().attackers[attackerIndex]?.health;
@@ -141,7 +142,7 @@ function dealDamageToAttacker(
     }
     attacker.destroy();
     useGameStore.getState().updateAttackerHealth(attackerIndex, 0);
-    useGameStore.getState().increaseScore(); // Increase score when attacker is destroyed
+    useGameStore.getState().increaseScore(shooterType); // Pass shooterType
   } else {
     useGameStore.getState().updateAttackerHealth(attackerIndex, newHealth);
   }
@@ -158,7 +159,7 @@ function dealAOEDamage(
     const attackerSprite = attacker as Phaser.GameObjects.Sprite;
     const distance = Phaser.Math.Distance.Between(center.x, center.y, attackerSprite.x, attackerSprite.y);
     if (distance <= radius) {
-      dealDamageToAttacker.call(this, attackerSprite, damage);
+      dealDamageToAttacker.call(this, attackerSprite, damage, "Wizard");
     }
   });
 }
