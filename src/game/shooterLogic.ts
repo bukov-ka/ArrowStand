@@ -29,19 +29,6 @@ function canPlaceShooter(x: number, y: number): boolean {
   return true;
 }
 
-export function getShooterImage(type: ShooterType): string {
-  switch (type) {
-    case "Archer":
-      return "archer";
-    case "Wizard":
-      return "wizard";
-    case "ShieldWielder":
-      return "shieldWielder";
-    default:
-      return "archer";
-  }
-}
-
 export function attackNearestAttacker(
   this: CustomSceneType,
   shooter: Phaser.GameObjects.Sprite
@@ -97,12 +84,40 @@ function getShooterTypeBySprite(shooter: Phaser.GameObjects.Sprite): ShooterType
   }
 }
 
+export function getShooterImage(type: ShooterType): string {
+  switch (type) {
+    case "Archer":
+      return "archer";
+    case "Wizard":
+      return "wizard";
+    case "ShieldWielder":
+      return "shieldWielder";
+    default:
+      return "archer";
+  }
+}
+
+function getArrowImage(shooterType: ShooterType): string {
+  switch (shooterType) {
+    case "Archer":
+      return "archerArrow";
+    case "Wizard":
+      return "wizardArrow";
+    case "ShieldWielder":
+      return "shieldWielderArrow";
+    default:
+      return "archerArrow";
+  }
+}
+
 function shootArrow(
   this: CustomSceneType,
   shooter: Phaser.GameObjects.Sprite,
   target: Phaser.GameObjects.Sprite
 ) {
-  const arrow = this.add.sprite(shooter.x, shooter.y, "arrow");
+  const shooterType = getShooterTypeBySprite(shooter); // Get shooter type
+  const arrowImage = getArrowImage(shooterType); // Get appropriate arrow image
+  const arrow = this.add.sprite(shooter.x, shooter.y, arrowImage); // Use the correct arrow image
   this.arrows.add(arrow);
   const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, target.x, target.y);
   arrow.setRotation(angle);
@@ -112,7 +127,6 @@ function shootArrow(
     y: target.y,
     duration: 100,
     onComplete: () => {
-      const shooterType = getShooterTypeBySprite(shooter);
       if (shooterType === "Wizard") {
         drawDamageRadius.call(this, target.x, target.y, ShooterConfig[shooterType].aoeRadius);
         dealAOEDamage.call(this, target, ShooterConfig[shooterType].damage, ShooterConfig[shooterType].aoeRadius);

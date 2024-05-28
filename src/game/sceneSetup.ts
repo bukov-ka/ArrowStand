@@ -17,6 +17,8 @@ export function preloadAssets(this: CustomSceneType) {
   this.load.image("archer", "assets/archer.png");
   this.load.image("wizard", "assets/wizard.png");
   this.load.image("shieldWielder", "assets/shieldWielder.png");
+  this.load.image("archerArrow", "assets/archerArrow.png");
+  this.load.image("wizardArrow", "assets/wizardArrow.png");
+  this.load.image("shieldWielderArrow", "assets/shieldWielderArrow.png");
   this.load.image("attacker", "assets/attacker.png");
-  this.load.image("arrow", "assets/arrow.png");
 }
