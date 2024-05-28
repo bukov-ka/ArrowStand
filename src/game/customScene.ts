@@ -6,7 +6,6 @@ import {
   spawnAttackers,
   spawnAttacker,
   moveTowardsClosestShooter,
-  updateAttackerHealthDisplay,
 } from "./attackerLogic";
 import { checkGameEnd } from "./gameEndLogic";
 import { attackNearestAttacker } from "./shooterLogic";
@@ -17,7 +16,6 @@ export interface CustomSceneType extends Phaser.Scene {
   arrows: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
-  healthTexts: Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Text>; // Add this line
   gamePhase: "placement" | "pre-battle" | "battle";
 }
 
@@ -27,7 +25,6 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
   arrows!: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
-  healthTexts: Map<Phaser.GameObjects.Sprite, Phaser.GameObjects.Text>;
   gamePhase: "placement" | "pre-battle" | "battle";
   startTime: number;
 
@@ -35,7 +32,6 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     super({ key: "CustomScene" });
     this.lastShotTime = new Map();
     this.lastAttackTime = new Map();
-    this.healthTexts = new Map();
     this.gamePhase = "placement";
     this.startTime = 0;
   }
@@ -62,14 +58,13 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
 
     this.gamePhase = useGameStore.getState().gamePhase;
 
-    this.startTime = this.time.now; // Record start time
+    this.startTime = this.time.now;
   }
 
   update() {
     if (useGameStore.getState().gamePhase === "battle") {
       this.attackers.getChildren().forEach((attacker: any, index: number) => {
         moveTowardsClosestShooter.call(this, attacker);
-        updateAttackerHealthDisplay.call(this, attacker);
       });
 
       this.shooters.getChildren().forEach((shooter: any) => {
@@ -81,7 +76,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     }
 
     const currentTime = this.time.now;
-    const survivedTime = Math.floor((currentTime - this.startTime) / 1000); // Calculate total time survived
-    useGameStore.getState().updateTimeSurvived(survivedTime); // Update the state
+    const survivedTime = Math.floor((currentTime - this.startTime) / 1000);
+    useGameStore.getState().updateTimeSurvived(survivedTime);
   }
 }

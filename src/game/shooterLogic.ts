@@ -149,14 +149,9 @@ function dealDamageToAttacker(
   const newHealth = attackerHealth - damage;
 
   if (newHealth <= 0) {
-    const healthText = this.healthTexts.get(attacker);
-    if (healthText) {
-      healthText.destroy();
-      this.healthTexts.delete(attacker);
-    }
     attacker.destroy();
     useGameStore.getState().updateAttackerHealth(attackerIndex, 0);
-    useGameStore.getState().increaseScore(shooterType); // Pass shooterType
+    useGameStore.getState().increaseScore(shooterType);
   } else {
     useGameStore.getState().updateAttackerHealth(attackerIndex, newHealth);
   }

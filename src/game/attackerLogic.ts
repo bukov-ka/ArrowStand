@@ -28,9 +28,6 @@ export function spawnAttacker(
   this.attackers.add(attacker);
   useGameStore.getState().addAttacker(x, y, type);
 
-  const healthText = this.add.text(x, y - 20, `HP: 100`, { fontSize: "12px", color: "#ff0000" });
-  this.healthTexts.set(attacker, healthText); // Store the health text in the map
-
   return attacker;
 }
 
@@ -120,23 +117,6 @@ export function moveTowardsClosestShooter(
       dealDamageToShooter.call(this, closestShooter);
       this.lastAttackTime.set(attacker, currentTime);
     }
-  }
-
-  // Update the health display for the attacker
-  updateAttackerHealthDisplay.call(this, attacker);
-}
-
-export function updateAttackerHealthDisplay(
-  this: CustomSceneType,
-  attacker: Phaser.GameObjects.Sprite
-) {
-  const attackerIndex = this.attackers.getChildren().indexOf(attacker);
-  const health = useGameStore.getState().attackers[attackerIndex]?.health;
-  const healthText = this.healthTexts.get(attacker);
-
-  if (healthText) {
-    healthText.setText(`HP: ${health}`);
-    healthText.setPosition(attacker.x, attacker.y - 20);
   }
 }
 
