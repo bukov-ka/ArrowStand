@@ -31,6 +31,10 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.css$/, // Add this rule to handle CSS files
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   plugins: [

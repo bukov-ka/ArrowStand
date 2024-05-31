@@ -1,8 +1,10 @@
 // src/components/App.tsx
+import './App.css';
 import React from "react";
 import Game from "./Game";
 import { useGameStore } from "../game/store";
 import { ShooterConfig, ShooterType } from "../game/shooterConfig";
+import ShooterDetails from "./ShooterDetails"; // Import the ShooterDetails component
 
 const App = () => {
   const gold = useGameStore((state) => state.gold);
@@ -18,20 +20,25 @@ const App = () => {
       <div>
         <h2>Gold: {gold}</h2>
         <h2>Score: {score}</h2> {/* Display the score */}
-        <ul>
-          {Object.keys(ShooterConfig).map((type) => {
-            const shooterType = type as ShooterType;
-            const { cost } = ShooterConfig[shooterType];
-            return (
-              <li key={shooterType}>
-                <button onClick={() => { setSelectedShooterType(shooterType); setRemoveMode(false); }}>
-                  {shooterType} - {cost} gold
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-        <button onClick={() => setRemoveMode(true)}>Remove Shooters</button> {}
+      </div>
+      <div className="controls-container">
+        <div className="buttons-container">
+          <ul>
+            {Object.keys(ShooterConfig).map((type) => {
+              const shooterType = type as ShooterType;
+              const { cost } = ShooterConfig[shooterType];
+              return (
+                <li key={shooterType}>
+                  <button onClick={() => { setSelectedShooterType(shooterType); setRemoveMode(false); }}>
+                    {shooterType} - {cost} gold
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <button onClick={() => setRemoveMode(true)}>Remove Shooters</button>
+        </div>
+        <ShooterDetails /> {/* Add the ShooterDetails component */}
       </div>
       {gamePhase === "placement" && (
         <button onClick={startPreBattle}>Start Pre-Battle</button>

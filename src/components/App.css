@@ -1,0 +1,24 @@
+/* src/components/App.css */
+.controls-container {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .buttons-container {
+    margin-right: 20px;
+  }
+  
+  .shooter-details {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .shooter-details h3 {
+    margin-top: 0;
+  }
+  
+  .shooter-details p {
+    margin: 5px 0;
+  }
+  
