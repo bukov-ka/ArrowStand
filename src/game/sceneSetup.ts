@@ -1,3 +1,4 @@
+// src/game/sceneSetup.ts
 import Phaser from "phaser";
 import { CustomSceneType } from "./customScene";
 
@@ -21,4 +22,5 @@ export function preloadAssets(this: CustomSceneType) {
   this.load.image("wizardArrow", "assets/wizardArrow.png");
   this.load.image("shieldWielderArrow", "assets/shieldWielderArrow.png");
   this.load.image("attacker", "assets/attacker.png");
+  this.load.image("removeCursor", "assets/removeCursor.png");
 }

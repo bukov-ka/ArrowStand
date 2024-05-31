@@ -3,12 +3,10 @@ import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { initializeScene, preloadAssets } from "./sceneSetup";
 import { handlePlacement, removeShootersInRadius } from "./shooterLogic";
-import {
-  spawnAttackers,
-  moveTowardsClosestShooter,
-} from "./attackerLogic";
+import { spawnAttackers, moveTowardsClosestShooter } from "./attackerLogic";
 import { checkGameEnd } from "./gameEndLogic";
 import { attackNearestAttacker } from "./shooterLogic";
+import { ShooterType, getShooterImage } from "./shooterConfig";
 
 export interface CustomSceneType extends Phaser.Scene {
   shooters: Phaser.GameObjects.Group;
@@ -17,6 +15,7 @@ export interface CustomSceneType extends Phaser.Scene {
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
   gamePhase: "placement" | "pre-battle" | "battle";
+  cursorSprite: Phaser.GameObjects.Sprite | null;
 }
 
 export class CustomScene extends Phaser.Scene implements CustomSceneType {
@@ -27,7 +26,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
   gamePhase: "placement" | "pre-battle" | "battle";
   startTime: number;
-  cursorCircle: Phaser.GameObjects.Graphics | null;
+  cursorSprite: Phaser.GameObjects.Sprite | null;
 
   constructor() {
     super({ key: "CustomScene" });
@@ -35,7 +34,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     this.lastAttackTime = new Map();
     this.gamePhase = "placement";
     this.startTime = 0;
-    this.cursorCircle = null;
+    this.cursorSprite = null;
   }
 
   preload() {
@@ -46,26 +45,75 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     initializeScene.call(this);
 
     this.input.on("pointerdown", (pointer: { x: any; y: any }) => {
-      if (useGameStore.getState().gamePhase === "placement" && !useGameStore.getState().removeMode) {
+      if (
+        useGameStore.getState().gamePhase === "placement" &&
+        !useGameStore.getState().removeMode
+      ) {
         handlePlacement.call(this, pointer);
       } else if (useGameStore.getState().removeMode) {
-        removeShootersInRadius.call(this, pointer.x, pointer.y, 100); // Remove shooters within a radius
+        // Workaround to remove shooters
+        // Single call does not remove all of them
+        for (var i = 0; i < 5; i++) {
+          removeShootersInRadius.call(this, pointer.x, pointer.y, 100); // Remove shooters within a radius
+        }
       }
     });
 
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+    this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
       if (useGameStore.getState().removeMode) {
-        if (!this.cursorCircle) {
-          this.cursorCircle = this.add.graphics();
-          this.cursorCircle.lineStyle(2, 0xff0000, 1);
-          this.cursorCircle.strokeCircle(pointer.x, pointer.y, 100);
+        if (
+          !this.cursorSprite ||
+          this.cursorSprite.texture.key !== "removeCursor"
+        ) {
+          if (this.cursorSprite) {
+            this.cursorSprite.destroy();
+          }
+          this.cursorSprite = this.add.sprite(
+            pointer.x,
+            pointer.y,
+            "removeCursor"
+          );
+          const removeCursorImage = this.textures
+            .get("removeCursor")
+            .getSourceImage();
+          this.cursorSprite.setDisplaySize(
+            removeCursorImage.width,
+            removeCursorImage.height
+          );
         } else {
-          this.cursorCircle.clear();
-          this.cursorCircle.lineStyle(2, 0xff0000, 1);
-          this.cursorCircle.strokeCircle(pointer.x, pointer.y, 100);
+          this.cursorSprite.setPosition(pointer.x, pointer.y);
         }
-      } else if (this.cursorCircle) {
-        this.cursorCircle.clear();
+      } else {
+        const selectedShooterType = useGameStore.getState().selectedShooterType;
+        if (selectedShooterType) {
+          const shooterImage = getShooterImage(selectedShooterType);
+          if (
+            !this.cursorSprite ||
+            this.cursorSprite.texture.key !== shooterImage
+          ) {
+            if (this.cursorSprite) {
+              this.cursorSprite.destroy();
+            }
+            this.cursorSprite = this.add.sprite(
+              pointer.x,
+              pointer.y,
+              shooterImage
+            );
+            const shooterImageSource = this.textures
+              .get(shooterImage)
+              .getSourceImage();
+            this.cursorSprite.setDisplaySize(
+              shooterImageSource.width,
+              shooterImageSource.height
+            );
+            this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90)); // Adjust rotation to 0 degrees
+          } else {
+            this.cursorSprite.setPosition(pointer.x, pointer.y);
+          }
+        } else if (this.cursorSprite) {
+          this.cursorSprite.destroy();
+          this.cursorSprite = null;
+        }
       }
     });
 

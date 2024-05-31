@@ -195,7 +195,9 @@ export function removeShootersInRadius(
     const shooterSprite = shooter as Phaser.GameObjects.Sprite;
     const distance = Phaser.Math.Distance.Between(x, y, shooterSprite.x, shooterSprite.y);
     if (distance <= radius) {
-      shooter.destroy();
+      shooterSprite.destroy();
+      const shooterIndex = this.shooters.getChildren().indexOf(shooterSprite);
+      useGameStore.getState().updateShooterHealth(shooterIndex, 0); // Ensure shooter is removed from store
     }
   });
 }
