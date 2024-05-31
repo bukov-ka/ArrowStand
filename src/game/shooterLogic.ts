@@ -19,11 +19,13 @@ export function handlePlacement(
     if (useGameStore.getState().gold >= cost) {
       placeShooter(x, y, selectedShooterType, cost);
       const shooter = this.add.sprite(x, y, getShooterImage(selectedShooterType));
+      shooter.setRotation(Phaser.Math.DegToRad(-90));
       this.shooters.add(shooter);
       this.lastShotTime.set(shooter, 0);
     }
   }
 }
+
 
 function canPlaceShooter(x: number, y: number): boolean {
   return true;
