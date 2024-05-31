@@ -26,7 +26,6 @@ export function handlePlacement(
   }
 }
 
-
 function canPlaceShooter(x: number, y: number): boolean {
   return true;
 }
@@ -182,5 +181,21 @@ function drawDamageRadius(this: CustomSceneType, x: number, y: number, radius: n
     callback: () => {
       circle.destroy();
     },
+  });
+}
+
+export function removeShootersInRadius(
+  this: CustomSceneType,
+  x: number,
+  y: number,
+  radius: number
+) {
+  const shooters = this.shooters.getChildren();
+  shooters.forEach((shooter) => {
+    const shooterSprite = shooter as Phaser.GameObjects.Sprite;
+    const distance = Phaser.Math.Distance.Between(x, y, shooterSprite.x, shooterSprite.y);
+    if (distance <= radius) {
+      shooter.destroy();
+    }
   });
 }

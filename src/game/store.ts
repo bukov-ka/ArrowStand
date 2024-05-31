@@ -1,3 +1,4 @@
+// src/game/store.ts
 import create from "zustand";
 import { ShooterConfig, ShooterType } from "./shooterConfig";
 
@@ -26,15 +27,17 @@ interface GameState {
   attackersDestroyedByArcher: number;
   attackersDestroyedByWizard: number;
   attackersDestroyedByShieldWielder: number;
+  removeMode: boolean;
   setSelectedShooterType: (type: ShooterType) => void;
   placeShooter: (x: number, y: number, type: ShooterType, cost: number) => void;
   startPreBattle: () => void;
   startBattle: () => void;
-  addAttacker: (x: number, y: number, type: string) => void;
-  updateAttackerHealth: (index: number, health: number) => void;
-  updateShooterHealth: (index: number, health: number) => void;
+  addAttacker: (x, y, type) => void;
+  updateAttackerHealth: (index, health) => void;
+  updateShooterHealth: (index, health) => void;
   increaseScore: (shooterType: ShooterType) => void;
   updateTimeSurvived: (time: number) => void;
+  setRemoveMode: (mode: boolean) => void; // Add this line
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -48,7 +51,8 @@ export const useGameStore = create<GameState>((set) => ({
   attackersDestroyedByArcher: 0,
   attackersDestroyedByWizard: 0,
   attackersDestroyedByShieldWielder: 0,
-  setSelectedShooterType: (type) => set({ selectedShooterType: type }),
+  removeMode: false,
+  setSelectedShooterType: (type) => set({ selectedShooterType: type, removeMode: false }), // Update this line
   placeShooter: (x, y, type, cost) =>
     set((state) => {
       if (state.gold >= cost) {
@@ -78,21 +82,23 @@ export const useGameStore = create<GameState>((set) => ({
     set((state) => {
       const shooters = [...state.shooters];
       if (shooters[index]) {
-        shooters[index].health = health;
-      }
-      return { shooters };
-    }),
-  increaseScore: (shooterType) =>
-    set((state) => {
-      const newState: Partial<GameState> = { score: state.score + 1 };
-      if (shooterType === "Archer") {
-        newState.attackersDestroyedByArcher = state.attackersDestroyedByArcher + 1;
-      } else if (shooterType === "Wizard") {
-        newState.attackersDestroyedByWizard = state.attackersDestroyedByWizard + 1;
-      } else if (shooterType === "ShieldWielder") {
-        newState.attackersDestroyedByShieldWielder = state.attackersDestroyedByShieldWielder + 1;
-      }
-      return newState;
-    }),
-  updateTimeSurvived: (time) => set({ totalTimeSurvived: time }), // Add this
-}));
+          shooters[index].health = health;
+        }
+        return { shooters };
+      }),
+    increaseScore: (shooterType) =>
+      set((state) => {
+        const newState: Partial<GameState> = { score: state.score + 1 };
+        if (shooterType === "Archer") {
+          newState.attackersDestroyedByArcher = state.attackersDestroyedByArcher + 1;
+        } else if (shooterType === "Wizard") {
+          newState.attackersDestroyedByWizard = state.attackersDestroyedByWizard + 1;
+        } else if (shooterType === "ShieldWielder") {
+          newState.attackersDestroyedByShieldWielder = state.attackersDestroyedByShieldWielder + 1;
+        }
+        return newState;
+      }),
+    updateTimeSurvived: (time) => set({ totalTimeSurvived: time }),
+    setRemoveMode: (mode) => set({ removeMode: mode }),
+  }));
+  

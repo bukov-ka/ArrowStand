@@ -1,10 +1,10 @@
+// src/game/customScene.ts
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { initializeScene, preloadAssets } from "./sceneSetup";
-import { handlePlacement } from "./shooterLogic";
+import { handlePlacement, removeShootersInRadius } from "./shooterLogic";
 import {
   spawnAttackers,
-  spawnAttacker,
   moveTowardsClosestShooter,
 } from "./attackerLogic";
 import { checkGameEnd } from "./gameEndLogic";
@@ -27,6 +27,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
   gamePhase: "placement" | "pre-battle" | "battle";
   startTime: number;
+  cursorCircle: Phaser.GameObjects.Graphics | null;
 
   constructor() {
     super({ key: "CustomScene" });
@@ -34,6 +35,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     this.lastAttackTime = new Map();
     this.gamePhase = "placement";
     this.startTime = 0;
+    this.cursorCircle = null;
   }
 
   preload() {
@@ -44,8 +46,26 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     initializeScene.call(this);
 
     this.input.on("pointerdown", (pointer: { x: any; y: any }) => {
-      if (useGameStore.getState().gamePhase === "placement") {
+      if (useGameStore.getState().gamePhase === "placement" && !useGameStore.getState().removeMode) {
         handlePlacement.call(this, pointer);
+      } else if (useGameStore.getState().removeMode) {
+        removeShootersInRadius.call(this, pointer.x, pointer.y, 100); // Remove shooters within a radius
+      }
+    });
+
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (useGameStore.getState().removeMode) {
+        if (!this.cursorCircle) {
+          this.cursorCircle = this.add.graphics();
+          this.cursorCircle.lineStyle(2, 0xff0000, 1);
+          this.cursorCircle.strokeCircle(pointer.x, pointer.y, 100);
+        } else {
+          this.cursorCircle.clear();
+          this.cursorCircle.lineStyle(2, 0xff0000, 1);
+          this.cursorCircle.strokeCircle(pointer.x, pointer.y, 100);
+        }
+      } else if (this.cursorCircle) {
+        this.cursorCircle.clear();
       }
     });
 
@@ -57,13 +77,12 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     });
 
     this.gamePhase = useGameStore.getState().gamePhase;
-
     this.startTime = this.time.now;
   }
 
   update() {
     if (useGameStore.getState().gamePhase === "battle") {
-      this.attackers.getChildren().forEach((attacker: any, index: number) => {
+      this.attackers.getChildren().forEach((attacker: any) => {
         moveTowardsClosestShooter.call(this, attacker);
       });
 

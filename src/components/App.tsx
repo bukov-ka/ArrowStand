@@ -7,11 +7,10 @@ import { ShooterConfig, ShooterType } from "../game/shooterConfig";
 const App = () => {
   const gold = useGameStore((state) => state.gold);
   const score = useGameStore((state) => state.score); // Get the score from the store
-  const setSelectedShooterType = useGameStore(
-    (state) => state.setSelectedShooterType
-  );
+  const setSelectedShooterType = useGameStore((state) => state.setSelectedShooterType);
   const startPreBattle = useGameStore((state) => state.startPreBattle);
   const gamePhase = useGameStore((state) => state.gamePhase);
+  const setRemoveMode = useGameStore((state) => state.setRemoveMode); // Add this line
 
   return (
     <div>
@@ -25,13 +24,14 @@ const App = () => {
             const { cost } = ShooterConfig[shooterType];
             return (
               <li key={shooterType}>
-                <button onClick={() => setSelectedShooterType(shooterType)}>
+                <button onClick={() => { setSelectedShooterType(shooterType); setRemoveMode(false); }}>
                   {shooterType} - {cost} gold
                 </button>
               </li>
             );
           })}
         </ul>
+        <button onClick={() => setRemoveMode(true)}>Remove Shooters</button> {}
       </div>
       {gamePhase === "placement" && (
         <button onClick={startPreBattle}>Start Pre-Battle</button>
