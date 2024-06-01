@@ -1,6 +1,7 @@
 // src/game/store.ts
 import create from "zustand";
 import { ShooterConfig, ShooterType } from "./shooterConfig";
+import { LeaderboardEntry, saveToLeaderboard } from "../utils/leaderboard";
 
 interface Attacker {
   x: number;
@@ -28,6 +29,7 @@ interface GameState {
   attackersDestroyedByWizard: number;
   attackersDestroyedByShieldWielder: number;
   removeMode: boolean;
+  leaderboard: LeaderboardEntry[];
   setSelectedShooterType: (type: ShooterType) => void;
   placeShooter: (x: number, y: number, type: ShooterType, cost: number) => void;
   startBattle: () => void;
@@ -38,6 +40,7 @@ interface GameState {
   updateTimeSurvived: (time: number) => void;
   setRemoveMode: (mode: boolean) => void;
   resetCursor: () => void;
+  updateLeaderboard: () => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -52,6 +55,7 @@ export const useGameStore = create<GameState>((set) => ({
   attackersDestroyedByWizard: 0,
   attackersDestroyedByShieldWielder: 0,
   removeMode: false,
+  leaderboard: JSON.parse(localStorage.getItem('leaderboard') || '[]'),
   setSelectedShooterType: (type) =>
     set({ selectedShooterType: type, removeMode: false }),
   placeShooter: (x, y, type, cost) =>
@@ -104,4 +108,8 @@ export const useGameStore = create<GameState>((set) => ({
   updateTimeSurvived: (time) => set({ totalTimeSurvived: time }),
   setRemoveMode: (mode) => set({ removeMode: mode }),
   resetCursor: () => set({ selectedShooterType: null, removeMode: false }),
+  updateLeaderboard: () => set((state) => {
+    const storedLeaderboard = localStorage.getItem('leaderboard');
+    return { leaderboard: storedLeaderboard ? JSON.parse(storedLeaderboard) : [] };
+  }),
 }));

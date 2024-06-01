@@ -1,38 +1,63 @@
 /* src/components/App.css */
 .controls-container {
-    display: flex;
-    align-items: flex-start;
-  }
-  
-  .buttons-container {
-    margin-right: 20px;
-  }
-  
-  .shooter-details {
-    border: 1px solid #ccc;
-    padding: 10px;
-    background-color: #f9f9f9;
-  }
-  
-  .shooter-details h3 {
-    margin-top: 0;
-  }
-  
-  .shooter-details p {
-    margin: 5px 0;
-  }
+  display: flex;
+  align-items: flex-start;
+}
 
-  .game-stats {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-  }
-  
-  .game-stats h2 {
-    margin-top: 0;
-  }
-  
-  .game-stats p {
-    margin: 5px 0;
-  }
+.buttons-container {
+  margin-right: 20px;
+}
+
+.shooter-details {
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.shooter-details h3 {
+  margin-top: 0;
+}
+
+.shooter-details p {
+  margin: 5px 0;
+}
+
+.game-stats {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  width: 578px;
+}
+
+.game-stats h2 {
+  margin-top: 0;
+}
+
+.game-stats p {
+  margin: 5px 0;
+}
+
+.leaderboard {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  width: 300px;
+}
+
+.leaderboard h2 {
+  margin-top: 0;
+}
+
+.leaderboard table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard th,
+.leaderboard td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}

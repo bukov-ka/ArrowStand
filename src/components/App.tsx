@@ -5,7 +5,8 @@ import Game from "./Game";
 import { useGameStore } from "../game/store";
 import { ShooterConfig, ShooterType } from "../game/shooterConfig";
 import ShooterDetails from "./ShooterDetails";
-import GameStats from "./GameStats";  // Import the GameStats component
+import GameStats from "./GameStats";
+import Leaderboard from "./Leaderboard";  // Import the Leaderboard component
 
 const App = () => {
   const gold = useGameStore((state) => state.gold);
@@ -20,7 +21,7 @@ const App = () => {
     <div>
       <h1>Arrow Stand</h1>
       <div>
-        <h2>Gold: {gold}</h2>
+        <h2>Gold left: {gold}</h2>
         <h2>Score: {score}</h2>
       </div>
       <div className="controls-container">
@@ -38,10 +39,11 @@ const App = () => {
                 </li>
               );
             })}
+          <li><button onClick={() => setRemoveMode(true)}>Remove Shooters</button></li>
           </ul>
-          <button onClick={() => setRemoveMode(true)}>Remove Shooters</button>
         </div>
         <ShooterDetails />
+        <Leaderboard />  {/* Add the Leaderboard component here */}
       </div>
       {gamePhase === "placement" && (
         <button onClick={() => useGameStore.getState().startBattle()}>
