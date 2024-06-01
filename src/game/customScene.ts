@@ -51,8 +51,6 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
       ) {
         handlePlacement.call(this, pointer);
       } else if (useGameStore.getState().removeMode) {
-        // Workaround to remove shooters
-        // Single call does not remove all of them
         for (var i = 0; i < 5; i++) {
           removeShootersInRadius.call(this, pointer.x, pointer.y, 100);
         }
@@ -96,26 +94,26 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
             }
             this.cursorSprite = this.add.sprite(
               pointer.x,
-              pointer.y,
-              shooterImage
-            );
-            const shooterImageSource = this.textures
-              .get(shooterImage)
-              .getSourceImage();
-            this.cursorSprite.setDisplaySize(
-              shooterImageSource.width,
-              shooterImageSource.height
-            );
-            this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90));
-          } else {
-            this.cursorSprite.setPosition(pointer.x, pointer.y);
-          }
-        } else if (this.cursorSprite) {
-          this.cursorSprite.destroy();
-          this.cursorSprite = null;
+            pointer.y,
+            shooterImage
+          );
+          const shooterImageSource = this.textures
+            .get(shooterImage)
+            .getSourceImage();
+          this.cursorSprite.setDisplaySize(
+            shooterImageSource.width,
+            shooterImageSource.height
+          );
+          this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90));
+        } else {
+          this.cursorSprite.setPosition(pointer.x, pointer.y);
         }
+      } else if (this.cursorSprite) {
+        this.cursorSprite.destroy();
+        this.cursorSprite = null;
       }
-    });
+    }
+  });
 
     this.time.addEvent({
       delay: 1000,
@@ -125,10 +123,13 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     });
 
     this.gamePhase = useGameStore.getState().gamePhase;
-    this.startTime = this.time.now;
 
-    // Listen for changes in game phase to reset cursor
+    // Listen for changes in game phase to reset cursor and start timing
     useGameStore.subscribe((state) => {
+      if (state.gamePhase === "battle" && this.gamePhase === "placement") {
+        this.startTime = this.time.now;
+      }
+      this.gamePhase = state.gamePhase;
       if (state.gamePhase !== "placement" && this.cursorSprite) {
         this.cursorSprite.destroy();
         this.cursorSprite = null;
@@ -148,10 +149,10 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
       });
 
       checkGameEnd.call(this);
-    }
 
-    const currentTime = this.time.now;
-    const survivedTime = Math.floor((currentTime - this.startTime) / 1000);
-    useGameStore.getState().updateTimeSurvived(survivedTime);
+      const currentTime = this.time.now;
+      const survivedTime = Math.floor((currentTime - this.startTime) / 1000);
+      useGameStore.getState().updateTimeSurvived(survivedTime);
+    }
   }
 }

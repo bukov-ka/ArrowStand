@@ -21,4 +21,18 @@
   .shooter-details p {
     margin: 5px 0;
   }
+
+  .game-stats {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+  }
   
+  .game-stats h2 {
+    margin-top: 0;
+  }
+  
+  .game-stats p {
+    margin: 5px 0;
+  }

@@ -65,7 +65,7 @@ export const useGameStore = create<GameState>((set) => ({
       }
       return state;
     }),
-  startBattle: () => set({ gamePhase: "battle" }), // Directly start battle
+  startBattle: () => set({ gamePhase: "battle" }),
   addAttacker: (x, y, type) =>
     set((state) => ({
       attackers: [...state.attackers, { x, y, type, health: 100 }],
