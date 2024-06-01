@@ -37,7 +37,8 @@ interface GameState {
   updateShooterHealth: (index, health) => void;
   increaseScore: (shooterType: ShooterType) => void;
   updateTimeSurvived: (time: number) => void;
-  setRemoveMode: (mode: boolean) => void; // Add this line
+  setRemoveMode: (mode: boolean) => void;
+  resetCursor: () => void; // Add this line
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -52,7 +53,7 @@ export const useGameStore = create<GameState>((set) => ({
   attackersDestroyedByWizard: 0,
   attackersDestroyedByShieldWielder: 0,
   removeMode: false,
-  setSelectedShooterType: (type) => set({ selectedShooterType: type, removeMode: false }), // Update this line
+  setSelectedShooterType: (type) => set({ selectedShooterType: type, removeMode: false }),
   placeShooter: (x, y, type, cost) =>
     set((state) => {
       if (state.gold >= cost) {
@@ -82,23 +83,23 @@ export const useGameStore = create<GameState>((set) => ({
     set((state) => {
       const shooters = [...state.shooters];
       if (shooters[index]) {
-          shooters[index].health = health;
-        }
-        return { shooters };
-      }),
-    increaseScore: (shooterType) =>
-      set((state) => {
-        const newState: Partial<GameState> = { score: state.score + 1 };
-        if (shooterType === "Archer") {
-          newState.attackersDestroyedByArcher = state.attackersDestroyedByArcher + 1;
-        } else if (shooterType === "Wizard") {
-          newState.attackersDestroyedByWizard = state.attackersDestroyedByWizard + 1;
-        } else if (shooterType === "ShieldWielder") {
-          newState.attackersDestroyedByShieldWielder = state.attackersDestroyedByShieldWielder + 1;
-        }
-        return newState;
-      }),
-    updateTimeSurvived: (time) => set({ totalTimeSurvived: time }),
-    setRemoveMode: (mode) => set({ removeMode: mode }),
-  }));
-  
+        shooters[index].health = health;
+      }
+      return { shooters };
+    }),
+  increaseScore: (shooterType) =>
+    set((state) => {
+      const newState: Partial<GameState> = { score: state.score + 1 };
+      if (shooterType === "Archer") {
+        newState.attackersDestroyedByArcher = state.attackersDestroyedByArcher + 1;
+      } else if (shooterType === "Wizard") {
+        newState.attackersDestroyedByWizard = state.attackersDestroyedByWizard + 1;
+      } else if (shooterType === "ShieldWielder") {
+        newState.attackersDestroyedByShieldWielder = state.attackersDestroyedByShieldWielder + 1;
+      }
+      return newState;
+    }),
+  updateTimeSurvived: (time) => set({ totalTimeSurvived: time }),
+  setRemoveMode: (mode) => set({ removeMode: mode }),
+  resetCursor: () => set({ selectedShooterType: null, removeMode: false }), // Add this line
+}));

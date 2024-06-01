@@ -126,6 +126,15 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
 
     this.gamePhase = useGameStore.getState().gamePhase;
     this.startTime = this.time.now;
+
+    // Listen for changes in game phase to reset cursor
+    useGameStore.subscribe((state) => {
+      if (state.gamePhase !== "placement" && this.cursorSprite) {
+        this.cursorSprite.destroy();
+        this.cursorSprite = null;
+        this.input.setDefaultCursor('default'); // Reset cursor to default
+      }
+    });
   }
 
   update() {
