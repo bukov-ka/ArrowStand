@@ -6,7 +6,7 @@ import { useGameStore } from "../game/store";
 import { ShooterConfig, ShooterType } from "../game/shooterConfig";
 import ShooterDetails from "./ShooterDetails";
 import GameStats from "./GameStats";
-import Leaderboard from "./Leaderboard";  // Import the Leaderboard component
+import Leaderboard from "./Leaderboard";
 
 const App = () => {
   const gold = useGameStore((state) => state.gold);
@@ -24,34 +24,38 @@ const App = () => {
         <h2>Gold left: {gold}</h2>
         <h2>Score: {score}</h2>
       </div>
-      <div className="controls-container">
-        <div className="buttons-container">
-          <ul>
-            {Object.keys(ShooterConfig).map((type) => {
-              const shooterType = type as ShooterType;
-              const { cost } = ShooterConfig[shooterType];
-              const numberOfShooters = shooters.filter(s => s.type === shooterType).length;
-              return (
-                <li key={shooterType}>
-                  <button onClick={() => { setSelectedShooterType(shooterType); setRemoveMode(false); }}>
-                    {shooterType} - {cost} gold ({numberOfShooters})
-                  </button>
-                </li>
-              );
-            })}
-          <li><button onClick={() => setRemoveMode(true)}>Remove Shooters</button></li>
-          </ul>
+      <div className="main-container">
+        <div className="controls-container">
+          <div className="buttons-container">
+            <ul>
+              {Object.keys(ShooterConfig).map((type) => {
+                const shooterType = type as ShooterType;
+                const { cost } = ShooterConfig[shooterType];
+                const numberOfShooters = shooters.filter(s => s.type === shooterType).length;
+                return (
+                  <li key={shooterType}>
+                    <button onClick={() => { setSelectedShooterType(shooterType); setRemoveMode(false); }}>
+                      {shooterType} - {cost} gold ({numberOfShooters})
+                    </button>
+                  </li>
+                );
+              })}
+              <li><button onClick={() => setRemoveMode(true)}>Remove Shooters</button></li>
+            </ul>
+          </div>
+          <ShooterDetails />
         </div>
-        <ShooterDetails />
-        <Leaderboard />  {/* Add the Leaderboard component here */}
+        <div id="game-container">
+          <Game />
+        </div>
+        <Leaderboard />
       </div>
       {gamePhase === "placement" && (
         <button onClick={() => useGameStore.getState().startBattle()}>
           Start Battle
         </button>
       )}
-      <Game />
-      {gamePhase === "battle" && <GameStats />}  {/* Conditionally render GameStats */}
+      {gamePhase === "battle" && <GameStats />}
     </div>
   );
 };

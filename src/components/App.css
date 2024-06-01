@@ -1,7 +1,9 @@
 /* src/components/App.css */
 .controls-container {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
+  margin-bottom: 20px;
 }
 
 .buttons-container {
@@ -44,6 +46,9 @@
   border: 1px solid #ccc;
   background-color: #f9f9f9;
   width: 300px;
+  position: absolute;
+  left: 610px;
+  top: 200px;
 }
 
 .leaderboard h2 {
@@ -60,4 +65,14 @@
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
+}
+
+#game-container {
+  flex-grow: 1;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
