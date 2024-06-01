@@ -5,7 +5,7 @@ import { CustomSceneType } from "./customScene";
 export function initializeScene(this: CustomSceneType) {
   const coef = 600 / 1024; // Scale the background image to the size
   const background = this.add
-    .tileSprite(0, 0, 1024, 3000 / coef, "background")
+    .tileSprite(0, 0, 1024, 600 / coef, "background")
     .setOrigin(0, 0);
   background.setScale(coef, coef);
   this.shooters = this.add.group();
