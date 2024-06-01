@@ -14,7 +14,7 @@ export interface CustomSceneType extends Phaser.Scene {
   arrows: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
-  gamePhase: "placement" | "pre-battle" | "battle";
+  gamePhase: "placement" | "battle";
   cursorSprite: Phaser.GameObjects.Sprite | null;
 }
 
@@ -24,7 +24,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
   arrows!: Phaser.GameObjects.Group;
   lastShotTime: Map<Phaser.GameObjects.Sprite, number>;
   lastAttackTime: Map<Phaser.GameObjects.Sprite, number>;
-  gamePhase: "placement" | "pre-battle" | "battle";
+  gamePhase: "placement" | "battle";
   startTime: number;
   cursorSprite: Phaser.GameObjects.Sprite | null;
 
@@ -54,7 +54,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
         // Workaround to remove shooters
         // Single call does not remove all of them
         for (var i = 0; i < 5; i++) {
-          removeShootersInRadius.call(this, pointer.x, pointer.y, 100); // Remove shooters within a radius
+          removeShootersInRadius.call(this, pointer.x, pointer.y, 100);
         }
       }
     });
@@ -106,7 +106,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
               shooterImageSource.width,
               shooterImageSource.height
             );
-            this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90)); // Adjust rotation to 0 degrees
+            this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90));
           } else {
             this.cursorSprite.setPosition(pointer.x, pointer.y);
           }
@@ -132,7 +132,7 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
       if (state.gamePhase !== "placement" && this.cursorSprite) {
         this.cursorSprite.destroy();
         this.cursorSprite = null;
-        this.input.setDefaultCursor('default'); // Reset cursor to default
+        this.input.setDefaultCursor("default");
       }
     });
   }
@@ -147,7 +147,6 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
         attackNearestAttacker.call(this, shooter);
       });
 
-      // Check win/lose conditions
       checkGameEnd.call(this);
     }
 

@@ -10,7 +10,6 @@ const App = () => {
   const gold = useGameStore((state) => state.gold);
   const score = useGameStore((state) => state.score); // Get the score from the store
   const setSelectedShooterType = useGameStore((state) => state.setSelectedShooterType);
-  const startPreBattle = useGameStore((state) => state.startPreBattle);
   const gamePhase = useGameStore((state) => state.gamePhase);
   const setRemoveMode = useGameStore((state) => state.setRemoveMode); // Add this line
 
@@ -41,9 +40,6 @@ const App = () => {
         <ShooterDetails /> {/* Add the ShooterDetails component */}
       </div>
       {gamePhase === "placement" && (
-        <button onClick={startPreBattle}>Start Pre-Battle</button>
-      )}
-      {gamePhase === "pre-battle" && (
         <button onClick={() => useGameStore.getState().startBattle()}>
           Start Battle
         </button>
