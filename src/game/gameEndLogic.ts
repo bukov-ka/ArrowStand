@@ -47,10 +47,12 @@ export function checkGameEnd(this: CustomSceneType) {
     gameOverDiv.style.top = '50%';
     gameOverDiv.style.left = '50%';
     gameOverDiv.style.transform = 'translate(-50%, -50%)';
-    gameOverDiv.style.backgroundColor = 'white';
+    gameOverDiv.style.backgroundColor = 'black';
     gameOverDiv.style.padding = '20px';
-    gameOverDiv.style.border = '1px solid black';
+    gameOverDiv.style.border = '2px solid white';
     gameOverDiv.style.textAlign = 'center';
+    gameOverDiv.style.color = 'white';
+    gameOverDiv.style.fontFamily = 'MedievalSharp, cursive';
 
     document.body.appendChild(gameOverDiv);
 

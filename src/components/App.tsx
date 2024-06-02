@@ -7,6 +7,7 @@ import { ShooterConfig, ShooterType } from "../game/shooterConfig";
 import ShooterDetails from "./ShooterDetails";
 import GameStats from "./GameStats";
 import Leaderboard from "./Leaderboard";
+import WelcomeScreen from "./WelcomeScreen";  // Import the WelcomeScreen component
 
 const App = () => {
   const gold = useGameStore((state) => state.gold);
@@ -19,6 +20,7 @@ const App = () => {
 
   return (
     <div>
+      <WelcomeScreen /> {/* Add the WelcomeScreen component */}
       <h1>Arrow Stand</h1>
       <div>
         <h2>Gold left: {gold}</h2>

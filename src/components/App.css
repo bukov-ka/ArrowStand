@@ -1,4 +1,14 @@
 /* src/components/App.css */
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: 'MedievalSharp', cursive;
+}
+
 .controls-container {
   display: flex;
   flex-direction: row;
@@ -13,7 +23,7 @@
 .shooter-details {
   border: 1px solid #ccc;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: #222;
 }
 
 .shooter-details h3 {
@@ -28,7 +38,7 @@
   margin-top: 20px;
   padding: 10px;
   border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  background-color: #222;
   width: 578px;
 }
 
@@ -44,7 +54,7 @@
   margin-top: 20px;
   padding: 10px;
   border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  background-color: #222;
   width: 300px;
   position: absolute;
   left: 610px;
@@ -69,10 +79,27 @@
 
 #game-container {
   flex-grow: 1;
+  background-color: #000;
 }
 
 .main-container {
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px 20px;
+  margin: 5px;
+  font-family: 'MedievalSharp', cursive;
+}
+
+button:hover {
+  background-color: #666;
 }
