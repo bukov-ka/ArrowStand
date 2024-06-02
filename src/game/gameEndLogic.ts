@@ -28,8 +28,37 @@ export function checkGameEnd(this: CustomSceneType) {
     // Trigger the leaderboard update
     useGameStore.getState().updateLeaderboard();
 
-    alert(
-      `You lose! All shooters were destroyed.\nTotal Survival Time: ${totalTimeSurvived}s\nAttackers Destroyed by Archers: ${attackersDestroyedByArcher}\nAttackers Destroyed by Wizards: ${attackersDestroyedByWizard}\nAttackers Destroyed by Shield Wielders: ${attackersDestroyedByShieldWielder}`
-    );
+    // Display the final score and new game button
+    const gameOverMessage = `
+      You lose! All shooters were destroyed.
+      Total Survival Time: ${totalTimeSurvived}s
+      Attackers Destroyed by Archers: ${attackersDestroyedByArcher}
+      Attackers Destroyed by Wizards: ${attackersDestroyedByWizard}
+      Attackers Destroyed by Shield Wielders: ${attackersDestroyedByShieldWielder}
+      Final Score: ${score}
+    `;
+
+    const gameOverDiv = document.createElement('div');
+    gameOverDiv.innerHTML = `
+      <p>${gameOverMessage.replace(/\n/g, '<br>')}</p>
+      <button id="new-game-button">New Game</button>
+    `;
+    gameOverDiv.style.position = 'absolute';
+    gameOverDiv.style.top = '50%';
+    gameOverDiv.style.left = '50%';
+    gameOverDiv.style.transform = 'translate(-50%, -50%)';
+    gameOverDiv.style.backgroundColor = 'white';
+    gameOverDiv.style.padding = '20px';
+    gameOverDiv.style.border = '1px solid black';
+    gameOverDiv.style.textAlign = 'center';
+
+    document.body.appendChild(gameOverDiv);
+
+    const newGameButton = document.getElementById('new-game-button');
+    if (newGameButton) {
+      newGameButton.addEventListener('click', () => {
+        window.location.reload();
+      });
+    }
   }
 }
