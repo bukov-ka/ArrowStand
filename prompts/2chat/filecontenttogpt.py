@@ -23,7 +23,7 @@ def extract_content_and_write_to_log(file_list):
 if __name__ == "__main__":
     target_directory = "../../"  # Replace this with the path to your target directory
     extensions = ['.ts', '.tsx', '.js', '.json', '.html', '.css']
-    skip_dirs = ['node_modules', '.git']  # Add any directories you want to skip here
+    skip_dirs = ['node_modules', '.git', 'dist']  # Add any directories you want to skip here
     skip_files = ['package-lock.json']  # Add any files you want to skip here
 
     files_to_process = get_files_with_extension(target_directory, extensions, skip_dirs, skip_files)
