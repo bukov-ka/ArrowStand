@@ -16,7 +16,7 @@ export const ShooterConfig = {
     cost: 200,
   },
   ShieldWielder: {
-    health: 300,
+    health: 1000,
     damage: 50,
     range: 100,
     reloadTime: 7000,
