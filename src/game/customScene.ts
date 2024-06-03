@@ -94,32 +94,25 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
             }
             this.cursorSprite = this.add.sprite(
               pointer.x,
-            pointer.y,
-            shooterImage
-          );
-          const shooterImageSource = this.textures
-            .get(shooterImage)
-            .getSourceImage();
-          this.cursorSprite.setDisplaySize(
-            shooterImageSource.width,
-            shooterImageSource.height
-          );
-          this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90));
-        } else {
-          this.cursorSprite.setPosition(pointer.x, pointer.y);
+              pointer.y,
+              shooterImage
+            );
+            const shooterImageSource = this.textures
+              .get(shooterImage)
+              .getSourceImage();
+            this.cursorSprite.setDisplaySize(
+              shooterImageSource.width,
+              shooterImageSource.height
+            );
+            this.cursorSprite.setRotation(Phaser.Math.DegToRad(-90));
+          } else {
+            this.cursorSprite.setPosition(pointer.x, pointer.y);
+          }
+        } else if (this.cursorSprite) {
+          this.cursorSprite.destroy();
+          this.cursorSprite = null;
         }
-      } else if (this.cursorSprite) {
-        this.cursorSprite.destroy();
-        this.cursorSprite = null;
       }
-    }
-  });
-
-    this.time.addEvent({
-      delay: 1000,
-      callback: spawnAttackers,
-      callbackScope: this,
-      loop: true,
     });
 
     this.gamePhase = useGameStore.getState().gamePhase;
@@ -138,10 +131,12 @@ export class CustomScene extends Phaser.Scene implements CustomSceneType {
     });
   }
 
-  update() {
+  update(time: number, delta: number) {
     if (useGameStore.getState().gamePhase === "battle") {
+      spawnAttackers.call(this, delta);
+
       this.attackers.getChildren().forEach((attacker: any) => {
-        moveTowardsClosestShooter.call(this, attacker);
+        moveTowardsClosestShooter.call(this, attacker, delta);
       });
 
       this.shooters.getChildren().forEach((shooter: any) => {

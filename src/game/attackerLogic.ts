@@ -1,19 +1,30 @@
 import Phaser from "phaser";
 import { useGameStore } from "./store";
 import { CustomSceneType } from "./customScene";
-import { ATTACKER_DAMAGE, ATTACKER_RELOAD_TIME, ATTACKER_SIZE } from "./constants";
+import {
+  ATTACKER_DAMAGE,
+  ATTACKER_RELOAD_TIME,
+  ATTACKER_SIZE,
+} from "./constants";
 
 let spawnCounter = 0; // Keep track of the spawn count
+let elapsedTimeSinceLastSpawn = 0;
 
-export function spawnAttackers(this: CustomSceneType) {
+export function spawnAttackers(this: CustomSceneType, delta: number) {
   if (useGameStore.getState().gamePhase === "battle") {
-    spawnCounter++;
-    const numberOfAttackersToSpawn = Math.floor(spawnCounter / 5) + 1; // Increase the number of attackers over time
+    elapsedTimeSinceLastSpawn += delta; // Accumulate elapsed time
+    // Check if enough time has passed to spawn new attackers
+    if (elapsedTimeSinceLastSpawn >= 500) {
+      spawnCounter++;
+      const numberOfAttackersToSpawn = Math.floor(spawnCounter / 5) + 1; // Increase the number of attackers over time
 
-    for (let i = 0; i < numberOfAttackersToSpawn; i++) {
-      const x = Phaser.Math.Between(50, 750);
-      const y = 0; // Spawn at the top
-      spawnAttacker.call(this, x, y, "Light Infantry");
+      for (let i = 0; i < numberOfAttackersToSpawn; i++) {
+        const x = Phaser.Math.Between(50, 750);
+        const y = 0; // Spawn at the top
+        spawnAttacker.call(this, x, y, "Light Infantry");
+      }
+
+      elapsedTimeSinceLastSpawn = 0; // Reset the elapsed time counter after spawning attackers
     }
   }
 }
@@ -33,7 +44,8 @@ export function spawnAttacker(
 
 export function moveTowardsClosestShooter(
   this: CustomSceneType,
-  attacker: Phaser.GameObjects.Sprite
+  attacker: Phaser.GameObjects.Sprite,
+  delta: number
 ) {
   const shooters = this.shooters.getChildren();
   const attackers = this.attackers.getChildren();
@@ -96,9 +108,13 @@ export function moveTowardsClosestShooter(
   // Normalize the combined direction vector
   direction.normalize();
 
+  // Calculate movement speed per second and adjust by delta time
+  const speed = 100; // Adjust this value to control speed
+  const velocity = direction.scale(speed * (delta / 1000));
+
   // Move the attacker
-  attacker.x += direction.x;
-  attacker.y += direction.y;
+  attacker.x += velocity.x;
+  attacker.y += velocity.y;
 
   // Rotate attacker to face closest shooter
   const angle = Phaser.Math.Angle.Between(
