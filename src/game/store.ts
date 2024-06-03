@@ -41,6 +41,7 @@ interface GameState {
   setRemoveMode: (mode: boolean) => void;
   resetCursor: () => void;
   updateLeaderboard: () => void;
+  removeShooter: (index: number, cost: number) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -55,7 +56,7 @@ export const useGameStore = create<GameState>((set) => ({
   attackersDestroyedByWizard: 0,
   attackersDestroyedByShieldWielder: 0,
   removeMode: false,
-  leaderboard: JSON.parse(localStorage.getItem('leaderboard') || '[]'),
+  leaderboard: JSON.parse(localStorage.getItem("leaderboard") || "[]"),
   setSelectedShooterType: (type) =>
     set({ selectedShooterType: type, removeMode: false }),
   placeShooter: (x, y, type, cost) =>
@@ -81,6 +82,14 @@ export const useGameStore = create<GameState>((set) => ({
         attackers[index].health = health;
       }
       return { attackers };
+    }),
+  removeShooter: (index, cost) =>
+    set((state) => {
+      const shooters = [...state.shooters];
+      console.log(index);
+      shooters.splice(index, 1); // Remove the shooter from the list
+      console.log(state.gold + cost);
+      return { shooters, gold: state.gold + cost }; // Add the cost back to the gold
     }),
   updateShooterHealth: (index, health) =>
     set((state) => {
@@ -108,8 +117,11 @@ export const useGameStore = create<GameState>((set) => ({
   updateTimeSurvived: (time) => set({ totalTimeSurvived: time }),
   setRemoveMode: (mode) => set({ removeMode: mode }),
   resetCursor: () => set({ selectedShooterType: null, removeMode: false }),
-  updateLeaderboard: () => set((state) => {
-    const storedLeaderboard = localStorage.getItem('leaderboard');
-    return { leaderboard: storedLeaderboard ? JSON.parse(storedLeaderboard) : [] };
-  }),
+  updateLeaderboard: () =>
+    set((state) => {
+      const storedLeaderboard = localStorage.getItem("leaderboard");
+      return {
+        leaderboard: storedLeaderboard ? JSON.parse(storedLeaderboard) : [],
+      };
+    }),
 }));

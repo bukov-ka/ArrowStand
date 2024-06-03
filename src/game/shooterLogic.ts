@@ -18,7 +18,11 @@ export function handlePlacement(
 
     if (useGameStore.getState().gold >= cost) {
       placeShooter(x, y, selectedShooterType, cost);
-      const shooter = this.add.sprite(x, y, getShooterImage(selectedShooterType));
+      const shooter = this.add.sprite(
+        x,
+        y,
+        getShooterImage(selectedShooterType)
+      );
       shooter.setRotation(Phaser.Math.DegToRad(-90));
       this.shooters.add(shooter);
       this.lastShotTime.set(shooter, 0);
@@ -72,7 +76,9 @@ export function attackNearestAttacker(
   }
 }
 
-function getShooterTypeBySprite(shooter: Phaser.GameObjects.Sprite): ShooterType {
+function getShooterTypeBySprite(
+  shooter: Phaser.GameObjects.Sprite
+): ShooterType {
   switch (shooter.texture.key) {
     case "archer":
       return "Archer";
@@ -120,7 +126,12 @@ function shootArrow(
   const arrowImage = getArrowImage(shooterType); // Get appropriate arrow image
   const arrow = this.add.sprite(shooter.x, shooter.y, arrowImage); // Use the correct arrow image
   this.arrows.add(arrow);
-  const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, target.x, target.y);
+  const angle = Phaser.Math.Angle.Between(
+    shooter.x,
+    shooter.y,
+    target.x,
+    target.y
+  );
   arrow.setRotation(angle);
   this.tweens.add({
     targets: arrow,
@@ -129,10 +140,25 @@ function shootArrow(
     duration: 100,
     onComplete: () => {
       if (shooterType === "Wizard") {
-        drawDamageRadius.call(this, target.x, target.y, ShooterConfig[shooterType].aoeRadius);
-        dealAOEDamage.call(this, target, ShooterConfig[shooterType].damage, ShooterConfig[shooterType].aoeRadius);
+        drawDamageRadius.call(
+          this,
+          target.x,
+          target.y,
+          ShooterConfig[shooterType].aoeRadius
+        );
+        dealAOEDamage.call(
+          this,
+          target,
+          ShooterConfig[shooterType].damage,
+          ShooterConfig[shooterType].aoeRadius
+        );
       } else {
-        dealDamageToAttacker.call(this, target, ShooterConfig[shooterType].damage, shooterType); // Pass shooterType
+        dealDamageToAttacker.call(
+          this,
+          target,
+          ShooterConfig[shooterType].damage,
+          shooterType
+        ); // Pass shooterType
       }
       arrow.destroy();
     },
@@ -146,7 +172,8 @@ function dealDamageToAttacker(
   shooterType: ShooterType
 ) {
   const attackerIndex = this.attackers.getChildren().indexOf(attacker);
-  const attackerHealth = useGameStore.getState().attackers[attackerIndex]?.health;
+  const attackerHealth =
+    useGameStore.getState().attackers[attackerIndex]?.health;
   const newHealth = attackerHealth - damage;
 
   if (newHealth <= 0) {
@@ -167,14 +194,24 @@ function dealAOEDamage(
   const attackers = this.attackers.getChildren();
   attackers.forEach((attacker) => {
     const attackerSprite = attacker as Phaser.GameObjects.Sprite;
-    const distance = Phaser.Math.Distance.Between(center.x, center.y, attackerSprite.x, attackerSprite.y);
+    const distance = Phaser.Math.Distance.Between(
+      center.x,
+      center.y,
+      attackerSprite.x,
+      attackerSprite.y
+    );
     if (distance <= radius) {
       dealDamageToAttacker.call(this, attackerSprite, damage, "Wizard");
     }
   });
 }
 
-function drawDamageRadius(this: CustomSceneType, x: number, y: number, radius: number) {
+function drawDamageRadius(
+  this: CustomSceneType,
+  x: number,
+  y: number,
+  radius: number
+) {
   const circle = this.add.circle(x, y, radius, 0xff0000, 0.3);
   this.time.addEvent({
     delay: 500, // Adjust the duration the circle is visible as needed
@@ -193,11 +230,18 @@ export function removeShootersInRadius(
   const shooters = this.shooters.getChildren();
   shooters.forEach((shooter) => {
     const shooterSprite = shooter as Phaser.GameObjects.Sprite;
-    const distance = Phaser.Math.Distance.Between(x, y, shooterSprite.x, shooterSprite.y);
+    const distance = Phaser.Math.Distance.Between(
+      x,
+      y,
+      shooterSprite.x,
+      shooterSprite.y
+    );
     if (distance <= radius) {
-      shooterSprite.destroy();
       const shooterIndex = this.shooters.getChildren().indexOf(shooterSprite);
-      useGameStore.getState().updateShooterHealth(shooterIndex, 0); // Ensure shooter is removed from store
+      shooterSprite.destroy();
+      const shooterType = getShooterTypeBySprite(shooterSprite); // Get the shooter type
+      const cost = ShooterConfig[shooterType].cost; // Get the cost of the shooter
+      useGameStore.getState().removeShooter(shooterIndex, cost); // Pass the cost when removing the shooter
     }
   });
 }
