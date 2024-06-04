@@ -53,16 +53,16 @@ export function checkGameEnd(this: CustomSceneType) {
       <p>${gameOverMessage.replace(/\n/g, "<br>")}</p>
       <button id="new-game-button">New Game</button>
     `;
-    gameOverDiv.style.position = "absolute";
-    gameOverDiv.style.top = "50%";
-    gameOverDiv.style.left = "50%";
-    gameOverDiv.style.transform = "translate(-50%, -50%)";
-    gameOverDiv.style.backgroundColor = "black";
-    gameOverDiv.style.padding = "20px";
-    gameOverDiv.style.border = "2px solid white";
-    gameOverDiv.style.textAlign = "center";
-    gameOverDiv.style.color = "white";
-    gameOverDiv.style.fontFamily = "MedievalSharp, cursive";
+    gameOverDiv.style.position = 'absolute';
+    gameOverDiv.style.top = '50%';
+    gameOverDiv.style.left = '20px';
+    gameOverDiv.style.transform = 'translateY(-50%)'; // Center vertically
+    gameOverDiv.style.backgroundColor = 'black';
+    gameOverDiv.style.padding = '20px';
+    gameOverDiv.style.border = '2px solid white';
+    gameOverDiv.style.textAlign = 'center';
+    gameOverDiv.style.color = 'white';
+    gameOverDiv.style.fontFamily = 'MedievalSharp, cursive';
 
     document.body.appendChild(gameOverDiv);
 

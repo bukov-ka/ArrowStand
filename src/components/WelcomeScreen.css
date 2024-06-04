@@ -9,7 +9,7 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the start */
   align-items: center;
   z-index: 1000;
 }
@@ -23,6 +23,7 @@
   color: #fff;
   font-family: 'MedievalSharp', cursive;
   border: 2px solid #fff; /* Add a white border */
+  margin-left: 20px; /* Shift the popup 300px from the left */
 }
 
 .welcome-content img {
