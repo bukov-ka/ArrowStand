@@ -29,9 +29,9 @@ const WelcomeScreen: React.FC = () => {
     <div className="welcome-screen">
       <div className="welcome-content">
         <img src="assets/intro.png" alt="Game Art" />
-        <p>Hordes of spiders are attacking your land. You cannot survive, but you can die with honor. Try to kill as many spiders as you can. 
+        <p>Hordes of spiders are attacking your land. 
         You have 10000 of gold to hire 3 types of defenders: archers, wizards and shieldwielders. 
-          Choose your warriors and their positions wisely.</p>
+        Choose your warriors and their positions wisely. Your goal is to kill 2000 spiders. Try to kill as many spiders as you can.</p>
         <div className="button-container">
           <button onClick={handleClose}>Close</button>
           <button onClick={handleNeverShowAgain}>Don't show again</button>

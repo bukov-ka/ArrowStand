@@ -7,16 +7,23 @@ import {
   ATTACKER_SIZE,
 } from "./constants";
 
-let spawnCounter = 0; // Keep track of the spawn count
+let spawnCounter = 0; // Keep track of the spawn cycles
+let totalAttackersSpawned = 0; // Keep track of the total attackers spawned
 let elapsedTimeSinceLastSpawn = 0;
+const MAX_ATTACKERS = 2000; // Maximum number of attackers
 
 export function spawnAttackers(this: CustomSceneType, delta: number) {
   if (useGameStore.getState().gamePhase === "battle") {
     elapsedTimeSinceLastSpawn += delta; // Accumulate elapsed time
     // Check if enough time has passed to spawn new attackers
-    if (elapsedTimeSinceLastSpawn >= 500) {
+    if (elapsedTimeSinceLastSpawn >= 500 && totalAttackersSpawned < MAX_ATTACKERS) {
       spawnCounter++;
-      const numberOfAttackersToSpawn = Math.floor(spawnCounter / 5) + 1; // Increase the number of attackers over time
+      let numberOfAttackersToSpawn = Math.floor(spawnCounter / 5) + 1; // Increase the number of attackers over time
+
+      // Adjust number of attackers to spawn if it exceeds the limit
+      if (totalAttackersSpawned + numberOfAttackersToSpawn > MAX_ATTACKERS) {
+        numberOfAttackersToSpawn = MAX_ATTACKERS - totalAttackersSpawned;
+      }
 
       for (let i = 0; i < numberOfAttackersToSpawn; i++) {
         const x = Phaser.Math.Between(50, 750);
@@ -24,6 +31,7 @@ export function spawnAttackers(this: CustomSceneType, delta: number) {
         spawnAttacker.call(this, x, y, "Light Infantry");
       }
 
+      totalAttackersSpawned += numberOfAttackersToSpawn;
       elapsedTimeSinceLastSpawn = 0; // Reset the elapsed time counter after spawning attackers
     }
   }
